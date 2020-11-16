@@ -6,3 +6,4 @@ something/
 *.o
 *.d
 *.mk
+makefile
