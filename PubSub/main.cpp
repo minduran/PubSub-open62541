@@ -39,6 +39,7 @@ int main(int argc, char **argv) {
 		thread t(UserInput::handlingUserInput, &pub, &restart);
 		t.detach();
 
+		cout << "hello world" << endl;
 
 		retval = pub.run();
 
