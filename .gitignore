@@ -7,3 +7,5 @@ something/
 *.d
 *.mk
 makefile
+PubSub/cmake-build-debug/
+PubSub/.idea/
