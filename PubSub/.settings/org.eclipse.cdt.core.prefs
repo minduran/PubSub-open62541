@@ -1,0 +1,16 @@
+doxygen/doxygen_new_line_after_brief=true
+doxygen/doxygen_use_brief_tag=false
+doxygen/doxygen_use_javadoc_tags=true
+doxygen/doxygen_use_pre_tag=false
+doxygen/doxygen_use_structural_commands=false
+eclipse.preferences.version=1
+environment/project/cdt.managedbuild.config.gnu.cross.exe.debug.2001931338/append=true
+environment/project/cdt.managedbuild.config.gnu.cross.exe.debug.2001931338/appendContributed=true
+environment/project/cdt.managedbuild.config.gnu.cross.exe.release.219272873/LD_LIBRARY_PATH/delimiter=\:
+environment/project/cdt.managedbuild.config.gnu.cross.exe.release.219272873/LD_LIBRARY_PATH/operation=append
+environment/project/cdt.managedbuild.config.gnu.cross.exe.release.219272873/LD_LIBRARY_PATH/value=/home/minh/open62541/build/bin
+environment/project/cdt.managedbuild.config.gnu.cross.exe.release.219272873/LIBP/delimiter=\:
+environment/project/cdt.managedbuild.config.gnu.cross.exe.release.219272873/LIBP/operation=append
+environment/project/cdt.managedbuild.config.gnu.cross.exe.release.219272873/LIBP/value=/home/minh/open62541/build/bin
+environment/project/cdt.managedbuild.config.gnu.cross.exe.release.219272873/append=true
+environment/project/cdt.managedbuild.config.gnu.cross.exe.release.219272873/appendContributed=true
