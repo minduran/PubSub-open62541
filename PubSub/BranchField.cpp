@@ -10,7 +10,7 @@
 
 using namespace std;
 
-UA_UInt16 BranchField::count = 0;
+UA_UInt32 BranchField::count = 0;
 Publisher *BranchField::pub;
 
 BranchField::BranchField() : variableType() {
@@ -19,9 +19,6 @@ BranchField::BranchField() : variableType() {
 
 BranchField::BranchField(UA_UInt16 *b, const UA_DataType *variableType, UA_NodeId &dataSet, UA_Boolean isString)
 : key{b[B_CONN], b[B_WG], b[B_DTS], b[B_VAR]}, variableType(variableType) {
-//	cout << BranchField::count << ". DataField added with token " << this->key[B_CONN] << "-" << this->key[B_WG] << "-" << this->key[B_DTS] << "-" << this->key[B_VAR] << endl;
-//	cout << BranchField::count << ". DataField added with token " << this->key[B_CONN] << "-" << this->key[B_WG] << "-" << this->key[B_DTS] << "-" << this->key[B_VAR] << endl;
-//	cout << "\tFD "<< key[B_VAR] <<" added to DS " << this->key[B_DTS]  << " of WG " << this->key[B_WG] << " on CH " << this->key[B_CONN] <<  "   Total FD: "<< this->count <<endl;
 	if(variableType == VAR_TYPE_DATETIME) {
 		dataSetField = pub->addDataSetField(dataSet, UA_NODEID_NUMERIC(0, UA_NS0ID_SERVER_SERVERSTATUS_CURRENTTIME));
 	}
@@ -31,7 +28,9 @@ BranchField::BranchField(UA_UInt16 *b, const UA_DataType *variableType, UA_NodeI
 	}
 
 	if (!isString)
-	cout << "\tFD " << this->key[B_VAR]  << " added to DS " << this->key[B_DTS] << " in WG " << this->key[B_WG] << " of CH " << this->key[B_CONN] << "  Total Field: " << BranchField::count << endl;
+		UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
+//						"FD %u %u %u %u added.    Total Fields: %u", key[B_VAR], key[B_DTS], key[B_WG], key[B_CONN], count);
+						"FD %u %u %u %u added", key[B_VAR], key[B_DTS], key[B_WG], key[B_CONN]);
 
 }
 
@@ -65,7 +64,7 @@ void BranchField::writeValue(char *val) {
 			value = false;
 		}
 		else {
-			cout << "Invalid boolean value!" << endl;
+			UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "%s is an invalid boolean input", val);
 		}
 		pub->writeVariable(&value, var, variableType);
 	}
@@ -114,7 +113,7 @@ void BranchField::writeValue(char *val) {
 
 void BranchField::writeStringChar(char val) {
 	UA_Byte value = (UA_Byte) val;
-	cout << (char) val << " ";
+//	cout << (char) val << " ";
 	pub->writeVariable(&value, var, variableType);
 }
 

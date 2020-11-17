@@ -21,7 +21,7 @@ class BranchConnection {
 	static Publisher *pub;
 
 public:
-	static UA_UInt16 count;
+	static UA_UInt32 count;
 	UA_NodeId connection;
 	UA_UInt16 port;
 	UA_UInt16 key[1];

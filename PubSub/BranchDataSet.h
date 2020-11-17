@@ -20,7 +20,7 @@ class BranchDataSet {
 	static Publisher *pub;
 
 public:
-	static UA_UInt16 count;
+	static UA_UInt32 count;
 	UA_Boolean isString;
 	UA_NodeId dataSet;
 	UA_NodeId dataSetWriter;

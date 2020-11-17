@@ -23,7 +23,7 @@ class BranchWriterGroup {
 	bool enabled;
 
 public:
-	static UA_UInt16 count;
+	static UA_UInt32 count;
 	UA_NodeId writerGroup;
 	UA_WriterGroupConfig wgConfig;
 	UA_UInt16 key[2];

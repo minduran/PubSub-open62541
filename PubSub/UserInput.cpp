@@ -210,11 +210,11 @@ void UserInput::decode(char *cmdLine) {
 			if (ptr == NULL) {
 				cout << "Specify file location" << endl;
 				const char *def= "pubsub.txt";
-				cout << "Loaded config file: '" << def << "'" << endl;
+				UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Open script file '%s'!", def);
 				file.open(def);
 			} else {
 				file.open(ptr);
-				cout << "Loaded config file: '" << ptr << "'" << endl;
+				UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Open script file '%s'!", ptr);
 			}
 
 			string lineText;
@@ -223,7 +223,8 @@ void UserInput::decode(char *cmdLine) {
 				while (getline(file,lineText))
 				{
 					char *script = strdup(lineText.c_str());
-					cout << script << endl;
+					UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Read CMD Line: '%s'", script);
+//					cout << script << endl;
 
 					if (!(script[0] == '/' && script[1] == '/'))
 						decode(script);
@@ -233,7 +234,7 @@ void UserInput::decode(char *cmdLine) {
 				file.close();
 				continue;
 			}
-			cout << "\tWarning: Unable to open script file!"<< endl;
+			UA_LOG_ERROR(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Could not open script file '%s'!", ptr);
 
 		}
 
@@ -410,14 +411,14 @@ void UserInput::decode(char *cmdLine) {
 			}
 
 
-			while(ptr != NULL) {
+			do{
 				if(/*nextCmdInQueue*/ enablePublish(&ptr) == KEY_FROM_SELECTED)
 					break;
 
 				if(ptr == NULL || atoi(ptr) != 0)
 					break;
 				ptr = strtok(NULL, delim);
-			}
+			} while(ptr != NULL);
 			continue;
 		}
 		else if(strcmp(ptr, "off") == 0) {
@@ -461,14 +462,14 @@ void UserInput::decode(char *cmdLine) {
 			}
 
 
-			while(ptr != NULL) {
+			do {
 				if(/*nextCmdInQueue*/ disablePublish(&ptr) == KEY_FROM_SELECTED)
 					break;
 
 				if(ptr == NULL || atoi(ptr) != 0)
 					break;
 				ptr = strtok(NULL, delim);
-			}
+			} while(ptr != NULL);
 			continue;
 		}
 		else if(strcmp(ptr, "intv") == 0) {
@@ -690,10 +691,6 @@ int UserInput::addBranch(char **ptr) {
 					continue;
 				}
 			}
-			else {
-				cout << "Channel " << chID << " does not exists" << endl;
-			}
-
 		} while(status != KEY_FROM_SELECTED && *ptr != NULL && (*ptr = strtok(NULL, delim)) !=  NULL && atoi(*ptr) != 0);
 	}
 
@@ -774,13 +771,6 @@ int UserInput::addBranch(char **ptr) {
 						continue;
 					}
 				}
-				else {
-					cout << "WriterGroup " << wgID << " does not exist" << endl;
-				}
-			}
-
-			else {
-				cout << "Channel " << chID << " does not exist" << endl;
 			}
 
 		} while(status != KEY_FROM_SELECTED && *ptr != NULL && (*ptr = strtok(NULL, delim)) !=  NULL && atoi(*ptr) != 0);
@@ -856,15 +846,12 @@ int UserInput::addBranch(char **ptr) {
 		}
 
 		while(*ptr != NULL) {
-			if(addDataSetString(ptr, buff) == KEY_FROM_SELECTED) {
-				status = KEY_FROM_SELECTED;
+			if((status = addDataSetString(ptr, buff)) == KEY_FROM_SELECTED)
 				break;
-			}
 
-			if(*ptr == NULL || atoi(*ptr) != 0){
-				status = 0;
+			if(*ptr == NULL)
 				break;
-			}
+			*ptr = strtok(NULL, delim);
 		}
 	}
 
@@ -977,14 +964,8 @@ int UserInput::addDataSetString(char **ptr, char *string) {
 				return status;
 			}
 		}
-		else {
-			cout << "WriterGroup " << wgID << " does not exist" << endl;
-		}
 	}
 
-	else {
-		cout << "Channel " << chID << " does not exist" << endl;
-	}
 	return status;
 }
 
@@ -1070,16 +1051,7 @@ int UserInput::writeString(char **ptr, char *string) {
 				itdts->second.writeString(string);
 				return status;
 			}
-			else {
-				cout << "String DataSet " << dsID << " does not exist in WriterGroup " << wgID << " of Channel " << chID << endl;
-			}
 		}
-		else {
-			cout << "WriterGroup " << wgID << " does not exist" << endl;
-		}
-	}
-	else {
-		cout << "Channel " << chID << " does not exist" << endl;
 	}
 	return status;
 }
@@ -1174,7 +1146,7 @@ int UserInput::addField(const UA_DataType *variableType, char **ptr) {
 				if(itwg->second.getDataset(dsID, &itdts)) {
 
 					if (itdts->second.isString) {
-						cout << "Forbidden to directly manipulate String DataSet" << endl;
+						UA_LOG_ERROR(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Forbidden to directly manipulate String DataSet");
 						continue;
 					}
 
@@ -1186,20 +1158,8 @@ int UserInput::addField(const UA_DataType *variableType, char **ptr) {
 
 						continue;
 					}
-					else {
-						cout << " in DataSet " << dsID <<" of WriterGroup " << wgID << " in Channel " << chID << endl;
-					}
-				}
-				else {
-					cout << "DataSet " << dsID << " does not exist" << endl;
 				}
 			}
-			else {
-				cout << "WriterGroup " << wgID << " does not exist" << endl;
-			}
-		}
-		else {
-			cout << "Channel " << chID << " does not exist" << endl;
 		}
 
 	} while(status != KEY_FROM_SELECTED && *ptr != NULL && (*ptr = strtok(NULL, delim)) != NULL && atoi(*ptr) != 0);
@@ -1253,7 +1213,6 @@ int UserInput::removeBranch(char **ptr) {
 				b[B_VAR] = 0;
 				continue;
 			}
-			cout << "Could not remove Channel " << chID << endl;
 
 		} while(*ptr != NULL && (*ptr = strtok(NULL, delim)) != NULL && atoi(*ptr) != 0 && status != KEY_FROM_SELECTED);
 
@@ -1330,14 +1289,7 @@ int UserInput::removeBranch(char **ptr) {
 					b[B_VAR] = 0;
 					continue;
 				}
-				else {
-					cout << " in Channel " << chID;
-				}
 			}
-			else {
-				cout << "Channel " << chID << " does not exist";
-			}
-			cout << ". Could not remove WriterGroup " << wgID << endl;
 		} while(*ptr != NULL && (*ptr = strtok(NULL, delim)) != NULL && atoi(*ptr) != 0 && status != KEY_FROM_SELECTED);
 
 	}
@@ -1438,18 +1390,8 @@ int UserInput::removeBranch(char **ptr) {
 
 						continue;
 					}
-					else {
-						cout << " in WriterGroup " << wgID << " of Channel " << chID;
-					}
-				}
-				else {
-					cout << "WriterGroup " << wgID << " does not exist";
 				}
 			}
-			else {
-				cout << "Channel " << chID << " does not exist";
-			}
-			cout << ". Could not remove DataSet " << dsID << endl;
 
 		} while(*ptr != NULL && (*ptr = strtok(NULL, delim)) != NULL && atoi(*ptr) != 0 && status != KEY_FROM_SELECTED);
 
@@ -1580,28 +1522,11 @@ int UserInput::removeBranch(char **ptr) {
 							b[B_DTS] = dsID;
 							b[B_VAR] = 0;
 
-							UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Field %d removed\n", fdID);
-//							cout << "Field " << fdID  << " is removed from DataSet " << dsID << " in WriterGroup " << wgID << " of Channel " << chID << endl;
-
 							continue;
 						}
-						else {
-							cout  << " in DataSet " << dsID << " of WriterGroup " << wgID << " in Channel " << chID;
-						}
-					}
-					else {
-						cout << "DataSet " << dsID << " does not exist";
 					}
 				}
-				else {
-					cout << "WriterGroup " << wgID << " does not exist";
-				}
 			}
-			else {
-				cout << "Channel " << chID << " does not exist";
-			}
-
-			cout << ". Could not remove Field " << fdID << endl;
 
 		} while(*ptr != NULL && (*ptr = strtok(NULL, delim)) !=  NULL && atoi(*ptr) != 0 && status != KEY_FROM_SELECTED);
 
@@ -1743,21 +1668,8 @@ int UserInput::writeVariable(char **ptr) {
 					itfd->second.writeValue(value);
 					return status;
 				}
-				else {
-
-				cout << "Field " << fdID << " does not exist in DataSet " << dsID << " of WriterGroup " << wgID << " in Channel " << chID << endl;
-				}
-			}
-			else {
-				cout << "DataSet " << dsID << " does not exist" << endl;
 			}
 		}
-		else {
-			cout << "WriterGroup " << wgID << " does not exist" << endl;
-		}
-	}
-	else {
-		cout << "Channel " << chID << " does not exist" << endl;
 	}
 	return 0;
 
@@ -1823,7 +1735,6 @@ int UserInput::updateInterval(char **ptr, UA_UInt16 interval) {
 		map<UA_UInt16, BranchWriterGroup>::iterator itwg;
 		if(it->second.getWritergroup(wgID, &itwg)) {
 			itwg->second.update(interval);
-			cout << "WG " << wgID <<  " of Channel " << chID << " set publishing interval to " << interval << "ms" << endl;
 //			b[B_CONN] = chID;
 //			b[B_WG] = wgID;
 //			b[B_DTS] = 0;
@@ -1832,12 +1743,6 @@ int UserInput::updateInterval(char **ptr, UA_UInt16 interval) {
 
 			return status;
 		}
-		else {
-			cout << " in Channel " << chID << endl;
-		}
-	}
-	else {
-		cout << "Channel " << chID << " does not exist" << endl;
 	}
 	return 0;
 }

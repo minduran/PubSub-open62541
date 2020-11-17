@@ -36,12 +36,9 @@ bool TreeTrunk::createConnection(UA_UInt16 port) {
 		BranchConnection conn(port, connKeyInc);
 		conn.key[B_CONN] = connKeyInc;
 		this->conns.insert(pair<UA_UInt16, BranchConnection>(connKeyInc, conn));
-//		cout << "Created ";
-//		conn.print();
-//		cout << endl;
 		return true;
 	}
-	cout << "The Channel key " << this->connKeyInc << " already exists" << endl;
+	UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "CH %u already exists", connKeyInc);
 	return false;
 }
 
@@ -52,9 +49,10 @@ bool TreeTrunk::deleteConnection(UA_UInt16 chKey) {
 		it->second.count--;
 		it->second.removeAllWritergroup();
 		conns.erase(chKey);
+		UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "CH %u removed", chKey);
 		return true;
 	}
-	cout << "Channel key " << chKey << " not found" << endl;
+	UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Could not remove CH %u", chKey);
 	return false;
 }
 
@@ -68,7 +66,10 @@ void TreeTrunk::deleteAllConnections(){
 }
 
 bool TreeTrunk::getChannel(UA_UInt16 connKey, map<UA_UInt16, BranchConnection>::iterator *it) {
-	return (*it = conns.find(connKey)) != conns.end();
+	if ((*it = conns.find(connKey)) != conns.end())
+		return true;
+	UA_LOG_ERROR(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "CH %u does not exist", connKey);
+	return false;
 }
 
 bool TreeTrunk::channelExists(UA_UInt16 connKey) {
@@ -84,7 +85,6 @@ bool TreeTrunk::getConnection(UA_UInt16 chKey,
 		*connection = it->second;
 		return true;
 	}
-	cout << "Channel " << chKey << " not found\n";
 	return false;
 }
 
@@ -99,7 +99,6 @@ bool TreeTrunk::getWriterGroup(UA_UInt16 *b,
 			return true;
 		}
 	}
-	cout << "WriterGroup " << b[B_WG] << " not found\n";
 	return false;
 }
 
@@ -113,7 +112,6 @@ bool TreeTrunk::getDataSet(UA_UInt16 *b, BranchDataSet *dataSet) {
 			return true;
 		}
 	}
-	cout << "DataSet " << b[B_DTS] << " not found\n";
 	return false;
 }
 
@@ -126,7 +124,6 @@ bool TreeTrunk::getField(UA_UInt16 *b, BranchField *field) {
 			return true;
 		}
 	}
-	cout << "Field " << b[B_VAR] << " not found\n";
 	return false;
 }
 
@@ -206,7 +203,7 @@ void TreeTrunk::updateWriterGroupOfChannel(UA_UInt16 chKey, UA_UInt16 interval) 
 		it->second.setIntervalOnAllWg(interval);
 	}
 	else {
-		cout << "Channel " << chKey << " does not exists" << endl;
+		UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Could not update interval of WGs of CH %u", chKey);
 	}
 }
 

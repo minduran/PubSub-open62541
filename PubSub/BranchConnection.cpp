@@ -11,7 +11,7 @@
 
 using namespace std;
 
-UA_UInt16 BranchConnection::count = 0;
+UA_UInt32 BranchConnection::count = 0;
 Publisher *BranchConnection::pub;
 
 BranchConnection::BranchConnection() : port(0), wgKeyInc(0) {
@@ -23,7 +23,10 @@ BranchConnection::BranchConnection(UA_UInt16 port, UA_UInt16 chKey) : port(port)
 	pub->setChannelPort(port);
 	this->connection = pub->addPubSubConnection();
 	this->count++;
-	cout << "\tCH "<< chKey <<" added on Port: " << port << "  Total CH: " << this->count <<  endl;
+	UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
+//			"CH %u added    Total Channels: %u", chKey, count);
+			"CH %u added", chKey);
+//	cout << "\tCH "<< chKey <<" added on Port: " << port << "  Total CH: " << this->count <<  endl;
 }
 
 BranchConnection::~BranchConnection() {
@@ -47,7 +50,7 @@ bool BranchConnection::addWritergroup() {
 		wg.insert(pair<UA_UInt16, BranchWriterGroup>(wgKeyInc, wgBranch));
 		return true;
 	}
-	cout << "WriterGroup " << wgKeyInc << " already exists" << endl;
+	UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "WG %u %u already exists", wgKeyInc, key[B_CONN]);
 	return false;
 }
 
@@ -58,9 +61,10 @@ bool BranchConnection::removeWritergroup(UA_UInt16 wgKey) {
 		it->second.removeAllDataset();
 		pub->removeWriterGroup(it->second.writerGroup);
 		wg.erase(wgKey);
+		UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "WG %u %u removed", wgKey, key[B_CONN]);
 		return true;
 	}
-	cout << "WriterGroup " << wgKey << " does not exist";
+	UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Could not remove WG %u %u", wgKey, key[B_CONN]);
 	return false;
 }
 
@@ -79,7 +83,10 @@ bool BranchConnection::writergroupExists(UA_UInt16 wgKey) {
 
 bool BranchConnection::getWritergroup(UA_UInt16 wgKey,
 		map<UA_UInt16, BranchWriterGroup>::iterator *it) {
-	return (*it = wg.find(wgKey)) != wg.end();
+	if ((*it = wg.find(wgKey)) != wg.end())
+		return true;
+	UA_LOG_ERROR(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "WG %u %u does not exist", wgKey, key[B_CONN]);
+	return false;
 }
 
 void BranchConnection::print() {
@@ -91,9 +98,7 @@ void BranchConnection::showWritergroups() {
 	while (it != wg.end()) {
 		cout << "\t";
 		it->second.print();
-//		cout << endl;
 		it->second.showDatasets();
-//		cout << endl;
 		it++;
 	}
 }

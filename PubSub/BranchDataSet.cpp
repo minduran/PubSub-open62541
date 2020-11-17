@@ -9,7 +9,7 @@
 
 #include <iostream>
 
-UA_UInt16 BranchDataSet::count = 0;
+UA_UInt32 BranchDataSet::count = 0;
 Publisher *BranchDataSet::pub;
 
 BranchDataSet::BranchDataSet() : isString(false), varKeyInc(0) {
@@ -18,12 +18,17 @@ BranchDataSet::BranchDataSet() : isString(false), varKeyInc(0) {
 
 BranchDataSet::BranchDataSet(UA_UInt16 connKey, UA_UInt16 wgKey, UA_UInt16 key)
 : isString(false), key{connKey, wgKey, key}, varKeyInc(0) {
-	cout << "\tDS " << this->key[B_DTS]  << " added to WG " << this->key[B_WG] << " of CH " << this->key[B_CONN] <<  "   Total DS: "<< this->count <<endl;
+//	cout << "\tDS " << this->key[B_DTS]  << " added to WG " << this->key[B_WG] << " of CH " << this->key[B_CONN] <<  "   Total DS: "<< this->count <<endl;
+	UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
+//				"DS %u %u %u added.    Total DataSets: %u", this->key[B_DTS],  this->key[B_WG],  this->key[B_CONN], count);
+				"DS %u %u %u added", this->key[B_DTS],  this->key[B_WG],  this->key[B_CONN]);
 }
 
 BranchDataSet::BranchDataSet(UA_UInt16 connKey, UA_UInt16 wgKey, UA_UInt16 key, UA_Boolean isString)
 : isString(isString), key{connKey, wgKey, key}, varKeyInc(0) {
-	cout << "\tDS " << this->key[B_DTS]  << " added to WG " << this->key[B_WG] << " of CH " << this->key[B_CONN] <<  "   Total DS: "<< this->count <<endl;
+	UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
+					"String DS %u %u %u added.    Total DataSets: %u",  this->key[B_DTS],  this->key[B_WG],  this->key[B_CONN], count);
+//	cout << "\tDS " << this->key[B_DTS]  << " added to WG " << this->key[B_WG] << " of CH " << this->key[B_CONN] <<  "   Total DS: "<< this->count <<endl;
 }
 
 BranchDataSet::~BranchDataSet() {
@@ -40,12 +45,10 @@ bool BranchDataSet::addData(const UA_DataType *variableType) {
 		BranchField::count++;
 		key[B_VAR] = varKeyInc;
 		BranchField fld(key, variableType, dataSet, isString);
-//		fld.var = pub->addVariable(variableType);
-//		fld.dataSetField = pub->addDataSetField(dataSet, fld.var);
 		fields.insert(pair<UA_UInt16, BranchField>(varKeyInc, fld));
 		return true;
 	}
-	cout << "DataSetField " << varKeyInc << " already exists";
+	UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "FD %u %u %u %u already exists", varKeyInc, key[B_DTS], key[B_WG], key[B_CONN]);
 	return false;
 }
 
@@ -55,10 +58,10 @@ bool BranchDataSet::removeData(UA_UInt16 varKey) {
 		BranchField::count--;
 		pub->removeDataSetField(it->second.dataSetField);
 		fields.erase(varKey);
-//		cout << "data removed" << endl;
+		UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Field %d %d %d %d removed", varKey, key[B_DTS], key[B_WG], key[B_CONN]);
 		return true;
 	}
-	cout << "DataField " << varKey << " does not exist";
+	UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Could not remove FD %u %u %u %u", varKey, key[B_DTS], key[B_WG], key[B_CONN]);
 	return false;
 }
 
@@ -67,7 +70,11 @@ bool BranchDataSet::fieldExists(UA_UInt16 varKey) {
 }
 
 bool BranchDataSet::getField(UA_UInt16 varKey, map<UA_UInt16, BranchField>::iterator *it) {
-	return (*it = fields.find(varKey)) != fields.end();
+	if ((*it = fields.find(varKey)) != fields.end()) {
+		return true;
+	}
+	UA_LOG_ERROR(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "FD %u %u %u %u does not exist", varKey, key[B_DTS], key[B_WG], key[B_CONN]);
+	return false;
 }
 
 void BranchDataSet::removeAllData() {
@@ -89,11 +96,11 @@ void BranchDataSet::print() {
 
 void BranchDataSet::writeString(char *string) {
 	if (isString) {
-
+		UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Writing Content: %s", string);
 		if(fields.size() > 0) {
 			map<UA_UInt16, BranchField>::iterator it = fields.begin();
 			UA_UInt16 i = 0;
-			cout << "Writing into DataSet " << key[B_DTS] << ": ";
+//			cout << "Writing into DataSet " << key[B_DTS] << ": ";
 			while(it != fields.end() && i < strlen(string)) {
 				it->second.writeStringChar(string[i++]);
 				it++;
@@ -117,7 +124,7 @@ void BranchDataSet::writeString(char *string) {
 		}
 	}
 	else {
-		cout << "This is not a String DataSet" << endl;
+		UA_LOG_ERROR(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "DS %u %u %u is not a String DataSet", key[B_DTS], key[B_WG], key[B_CONN]);
 	}
 }
 

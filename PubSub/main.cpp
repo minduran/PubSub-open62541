@@ -29,8 +29,8 @@ int main(int argc, char **argv) {
 
 		cout << "\nParameters set:" << endl;
 		cout << "\tserver port:\t" << data.serverPort << endl;
-		cout << "\taddress url:\t" << data.networkAddressUrl.url.data << "\n\n";
-		cout << "\ttransport profile:\t" << data.transportProfile.data << "\n\n";
+		cout << "\taddress url:\t" << data.networkAddressUrl.url.data << "\n";
+		cout << "\ttp profile:\t" << data.transportProfile.data << "\n\n";
 
 
 		Publisher pub(&data);

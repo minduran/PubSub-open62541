@@ -17,7 +17,7 @@ class BranchField {
 	static Publisher *pub;
 
 public:
-	static UA_UInt16 count;
+	static UA_UInt32 count;
 	UA_NodeId var;
 	UA_NodeId dataSetField;
 	UA_UInt16 key[4];
