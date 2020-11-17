@@ -74,7 +74,6 @@ void UserInput::handlingUserInput(Publisher *pub, UA_Boolean *restart) {
 		cout << endl;
 		cout << "User Input: ";
 		getline(cin, input);
-//		cout << "You have entered: " << input << endl;
 
 		if(input.compare("exit") == 0) {
 			tree.deleteAllConnections();
@@ -99,13 +98,12 @@ void UserInput::handlingUserInput(Publisher *pub, UA_Boolean *restart) {
 /******************DECODE COMMAND*************************************************************/
 void UserInput::decode(char *cmdLine) {
 	cmdLength = strlen(cmdLine);
-//	cout << "1. " << cmdLength << endl;
 	char *ptr = strtok(cmdLine, delim);
 
 	while(ptr != NULL)
 	{
 		cmdLength -= strlen(ptr);
-//		cout << "2. " << cmdLength << endl;
+
 		if(strcmp(ptr, "disable") == 0) {
 			ptr = strtok(NULL, delim);
 			if(ptr != NULL) {
@@ -247,24 +245,20 @@ void UserInput::decode(char *cmdLine) {
 				continue;
 			}
 			cmdLength -= strlen(ptr);
-//			cout << "3. " << cmdLength << endl;
 
-			int status = addBranch(&ptr);
-			while (status > 0) {
-				if (status == 2 || ptr == NULL)
+
+			while (ptr != NULL && addBranch(&ptr) < 3)
+			{
+				if(ptr != NULL && atoi(ptr) == 0)
+					continue;
+				if (ptr == NULL)
 					break;
-				if(!(ptr != NULL && atoi(ptr) == 0)) {
-					ptr = strtok(NULL, delim);
-					if(ptr == NULL)
-						break;
-				}
 
 
-				status = addBranch(&ptr);
+				ptr = strtok(NULL, delim);
 			}
 
-			if(status == 2)
-				continue;
+			continue;
 		}
 		else if(strcmp(ptr, "rm") == 0) {
 			ptr = strtok(NULL, delim);
@@ -274,24 +268,13 @@ void UserInput::decode(char *cmdLine) {
 				continue;
 			}
 
-			while (removeBranch(&ptr) > -1) {
+			while (ptr != NULL && removeBranch(&ptr) < 3)
+			{
+				if(ptr != NULL && atoi(ptr) == 0)
+					continue;
 				if (ptr == NULL)
-					break;
-				if (atoi(ptr) == 0)
-				if(strcmp(ptr, "ch") != 0)
-				if(strcmp(ptr, "wg") != 0)
-				if(strcmp(ptr, "ds") != 0)
-				if(strcmp(ptr, "fd") != 0)
 					break;
 				ptr = strtok(NULL, delim);
-				if (ptr == NULL)
-					break;
-				if (atoi(ptr) == 0)
-				if(strcmp(ptr, "ch") != 0)
-				if(strcmp(ptr, "wg") != 0)
-				if(strcmp(ptr, "ds") != 0)
-				if(strcmp(ptr, "fd") != 0)
-					break;
 			}
 
 			continue;
@@ -304,16 +287,12 @@ void UserInput::decode(char *cmdLine) {
 				continue;
 			}
 
-			while (writeVariable(&ptr) > -1) {
-				if(ptr == NULL)
+			while (ptr != NULL) {
+				if(writeVariable(&ptr) == KEY_FROM_SELECTED)
 					break;
-				if(atoi(ptr) == 0) // if 0 means id is not selected
+				if(ptr == NULL || atoi(ptr) != 0)
 					break;
 				ptr = strtok(NULL, delim);
-				if(ptr == NULL)
-					break;
-				if(atoi(ptr) == 0) // if 0 means id is not selected
-					break;
 			}
 
 		continue;
@@ -390,7 +369,6 @@ void UserInput::decode(char *cmdLine) {
 		}
 
 		else if(strcmp(ptr, "on") == 0) {
-			bool nextCmdInQueue = false;
 
 			ptr = strtok(NULL, delim);
 			if(ptr != NULL && atoi(ptr) == 0) {
@@ -422,35 +400,27 @@ void UserInput::decode(char *cmdLine) {
 					}
 					UA_UInt16 port;
 
-					while(ptr != NULL && atoi(ptr) != 0) {
-						port = atoi(ptr);
+					while(ptr != NULL && (port = atoi(ptr)) > 999 && port < 10000) {
 						tree.enableWriterGroupOfPort(port);
 						ptr = strtok(NULL, delim);
 					}
 
 					continue;
 				}
-				else {
-					nextCmdInQueue = true;
-				}
 			}
 
-			UA_Byte status = 0;
 
-			while((status = enablePublish(&ptr)) > 0) {
-				if(nextCmdInQueue || status == 2)
+			while(ptr != NULL) {
+				if(/*nextCmdInQueue*/ enablePublish(&ptr) == KEY_FROM_SELECTED)
 					break;
 
+				if(ptr == NULL || atoi(ptr) != 0)
+					break;
 				ptr = strtok(NULL, delim);
-				if(ptr == NULL)
-					break;
-				if(atoi(ptr) == 0)
-					break;
 			}
 			continue;
 		}
 		else if(strcmp(ptr, "off") == 0) {
-			bool nextCmdInQueue = false;
 
 			ptr = strtok(NULL, delim);
 			if(ptr != NULL && atoi(ptr) == 0) {
@@ -482,31 +452,22 @@ void UserInput::decode(char *cmdLine) {
 					}
 					UA_UInt16 port;
 
-					while(ptr != NULL && atoi(ptr) != 0) {
-						port = atoi(ptr);
+					while(ptr != NULL && (port = atoi(ptr)) > 999 && port < 10000) {
 						tree.disableWriterGroupOfPort(port);
 						ptr = strtok(NULL, delim);
 					}
-
 					continue;
 				}
-				else {
-						nextCmdInQueue = true;
-					}
-				}
+			}
 
-			UA_Byte status = 0;
 
-			while((status = disablePublish(&ptr)) > 0) {
-				if(nextCmdInQueue || status == 2)
+			while(ptr != NULL) {
+				if(/*nextCmdInQueue*/ disablePublish(&ptr) == KEY_FROM_SELECTED)
 					break;
 
+				if(ptr == NULL || atoi(ptr) != 0)
+					break;
 				ptr = strtok(NULL, delim);
-				if(ptr == NULL)
-					break;
-				if(atoi(ptr) == 0)
-					break;
-
 			}
 			continue;
 		}
@@ -539,8 +500,7 @@ void UserInput::decode(char *cmdLine) {
 				}
 				UA_UInt16 chID;
 
-				while(ptr != NULL && atoi(ptr) != 0) {
-					chID = atoi(ptr);
+				while(ptr != NULL && (chID = atoi(ptr)) != 0) {
 					tree.updateWriterGroupOfChannel(chID, interval);
 					ptr = strtok(NULL, delim);
 				}
@@ -555,8 +515,7 @@ void UserInput::decode(char *cmdLine) {
 				}
 				UA_UInt16 port;
 
-				while(ptr != NULL && atoi(ptr) != 0) {
-					port = atoi(ptr);
+				while(ptr != NULL && (port = atoi(ptr)) > 999 && port < 10000) {
 					tree.updateWriterGroupOfPort(port, interval);
 					ptr = strtok(NULL, delim);
 				}
@@ -564,14 +523,12 @@ void UserInput::decode(char *cmdLine) {
 				continue;
 			}
 
-			while(updateInterval(&ptr, interval) > -1) {
-				if(ptr == NULL)
+			while(ptr!= NULL) {
+				if(updateInterval(&ptr, interval) == KEY_FROM_SELECTED)
 					break;
-				if(atoi(ptr) == 0)
+				if(ptr == NULL || atoi(ptr) != 0)
 					break;
 				ptr = strtok(NULL, delim);
-				if(ptr == NULL)
-					break;
 			}
 			continue;
 		} else if (strcmp(ptr, "wrtstr") == 0) {
@@ -586,69 +543,51 @@ void UserInput::decode(char *cmdLine) {
 
 			UA_UInt16 count = getStringFromCmd(buff, ptr);
 
-//			cout << "count " << count << endl;
-//			UA_UInt16 check = 0;
-
 			while (count-- > 0) {
-//				check += strlen(ptr);
 				ptr = strtok(NULL, delim);
 
 				if(ptr != NULL && strstr(ptr, "\"") != NULL) {
 					ptr = strtok(NULL, delim);
-//					if(ptr != NULL)
-//					check += strlen(ptr);
 					break;
 				}
 			}
-//			cout << "buffer size " << strlen(buff) << " check size " << check<<  endl;
-
-//			if(ptr != NULL)
-//			cout << "what is in ptr " << ptr << endl;
 
 
-			while(writeString(&ptr, buff) > -1) {
-				if(ptr == NULL || (ptr != NULL && atoi(ptr) == 0))
+			while(ptr != NULL && atoi(ptr) != 0) {
+				if(writeString(&ptr, buff) == KEY_FROM_SELECTED)
+					break;
+				if(ptr == NULL)
 					break;
 				ptr = strtok(NULL, delim);
-				if(ptr == NULL || (ptr != NULL && atoi(ptr) == 0))
-					break;
-				cout << "what is in ptr " << ptr << endl;
 			}
 
 
 			continue;
 
 		} else {
-			cmdLength += strlen(ptr) + 1;
 			if(ptr == NULL || ptr[0] != '"') {
-				cout << "Invalid Command" << endl;
-				if(ptr != NULL)
+				if(ptr != NULL) {
+					UA_LOG_ERROR(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
+					                       "%s is an invalid command", ptr);
 					ptr = strtok(NULL, delim);
+				}
 				continue;
 			}
+			cmdLength += strlen(ptr);
 
 			char buff[STRING_SIZE];
 
 			UA_UInt16 count = getStringFromCmd(buff, ptr);
 
-//			cout << "count " << count << endl;
-//			UA_UInt16 check = 0;
 			while (count-- > 0) {
-//				check += strlen(ptr);
 				ptr = strtok(NULL, delim);
 
 				if(ptr != NULL && strstr(ptr, "\"") != NULL) {
-//					cout << " break" << endl;
 					ptr = strtok(NULL, delim);
-//					if(ptr != NULL)
-//					check += strlen(ptr);
 					break;
 				}
 			}
 
-//			if(ptr != NULL)
-//			cout << "what is in ptr: " << ptr << endl;
-//			cout << "buffer size " << strlen(buff) << " check size " << check<<  endl;
 
 			while(writeString(&ptr, buff) > -1) {
 				if(ptr == NULL || (ptr != NULL && atoi(ptr) == 0))
@@ -675,6 +614,7 @@ void UserInput::decode(char *cmdLine) {
 /****************Add Branch************************************************************************/
 
 int UserInput::addBranch(char **ptr) {
+	UA_Byte status = NO_MATCHING_CMD;
 
 	if (*ptr == NULL) {
 		return 0;
@@ -686,19 +626,23 @@ int UserInput::addBranch(char **ptr) {
 			cout << "Provide port for adding channel" << endl;
 			return 0;
 		}
+		status = 0;
+		UA_UInt16 port;
 
-		UA_UInt16 port = atoi(*ptr);
-		if (port < 1000 || port > 9999) {
+		while(*ptr != NULL && (port = atoi(*ptr)) != 0) {
+
+			if (port < 1000 || port > 9999) {
 				cout << port << " is an invalid port" << endl;
-				return 0;
-		}
-		if(tree.createConnection(port)) {
-			b[B_CONN] = tree.connKeyInc;
+				*ptr = strtok(NULL, delim);
+				continue;
+			}
 
-			current_conn = tree.conns.at(tree.connKeyInc);
-//			cout << "New added Ch " << current_conn->port << endl;
-
-			return 1;
+			if(tree.createConnection(port)) {
+				b[B_CONN] = tree.connKeyInc;
+				current_conn = tree.conns.at(tree.connKeyInc);
+	//			cout << "New added Ch " << current_conn->port << endl;
+			}
+			*ptr = strtok(NULL, delim);
 		}
 
 	}
@@ -709,112 +653,137 @@ int UserInput::addBranch(char **ptr) {
 			return 0;
 		}
 
-		UA_UInt16 id = b[B_CONN];
-
-		if (*ptr != NULL && atoi(*ptr) != 0) {
-			id = atoi(*ptr);
-		}
-
-		map<UA_UInt16, BranchConnection>::iterator it;
-		if(tree.getChannel(id, &it)) {
-			if(it->second.addWritergroup()) {
-				b[B_CONN] = id;
-				b[B_WG] = it->second.wgKeyInc;
-
-
-				current_conn = it->second;
-				current_wg = it->second.wg.at(b[B_WG]);
-//				cout << "New added WG " << current_wg->key[B_WG] << endl;
-
-				return 1;
+		UA_UInt16 chID;
+		do {
+			chID = 0;
+			status = KEY_NOT_PROVIDED;
+			if (*ptr != NULL) {
+				 if(atoi(*ptr) != 0) {
+					 chID = atoi(*ptr);
+					 status = KEY_FROM_INPUT;
+				 } else {
+					 status = KEY_FROM_SELECTED;
+				 }
 			}
-		}
-		else {
-			cout << "Channel " << id << " does not exists" << endl;
-		}
 
-		return 0;
+			if(status != KEY_FROM_INPUT) {
+				if (b[B_CONN] == 0) {
+					cout << "Provide channel ID for removing" << endl;
+					return 0;
+				}
+				chID = b[B_CONN];
+				status = KEY_FROM_SELECTED;
+			}
 
+
+			map<UA_UInt16, BranchConnection>::iterator it;
+			if(tree.getChannel(chID, &it)) {
+				if(it->second.addWritergroup()) {
+					b[B_CONN] = chID;
+					b[B_WG] = it->second.wgKeyInc;
+
+
+					current_conn = it->second;
+					current_wg = it->second.wg.at(b[B_WG]);
+	//				cout << "New added WG " << current_wg->key[B_WG] << endl;
+
+					continue;
+				}
+			}
+			else {
+				cout << "Channel " << chID << " does not exists" << endl;
+			}
+
+		} while(status != KEY_FROM_SELECTED && *ptr != NULL && (*ptr = strtok(NULL, delim)) !=  NULL && atoi(*ptr) != 0);
 	}
 
 
 	else if (strcmp(*ptr, "ds") == 0) {
 		*ptr = strtok(NULL, delim);
-
-		UA_UInt16 wgID = 0;
-		UA_UInt16 chID = 0;
-		UA_Byte status = KEY_NOT_PROVIDED;
-
-
-		if(*ptr != NULL) {
-			if(atoi(*ptr) != 0) {
-				wgID = atoi(*ptr);
-				status = KEY_FROM_INPUT;
-			}
-			else  {
-				status = KEY_FROM_SELECTED;
-			}
+		if (*ptr == NULL && b[B_WG] == 0) {
+			cout << "Specify WriterGroup ID to add DataSet" << endl;
+			return 0;
 		}
 
-		if (status != KEY_FROM_INPUT) {
-			if (b[B_WG] == 0) {
-				cout << "Specify WriterGroup ID to add DataSet to" << endl;
-				return 0;
-			}
-			wgID = b[B_WG];
-			status = KEY_FROM_SELECTED;
-		}
 
-		if (status == KEY_FROM_INPUT) {
+		UA_UInt16 wgID;
+		UA_UInt16 chID;
+
+		do {
+			wgID = 0;
+			chID = 0;
 			status = KEY_NOT_PROVIDED;
-			*ptr = strtok(NULL, delim);
+
 			if(*ptr != NULL) {
 				if(atoi(*ptr) != 0) {
-					chID = atoi(*ptr);
+					wgID = atoi(*ptr);
 					status = KEY_FROM_INPUT;
 				}
 				else  {
 					status = KEY_FROM_SELECTED;
 				}
 			}
-		}
 
-
-		if (status != KEY_FROM_INPUT) {
-			if (b[B_CONN] == 0) {
-				cout << "Specify Channel ID to add DataSet to" << endl;
-				return 0;
+			if (status != KEY_FROM_INPUT) {
+				if (b[B_WG] == 0) {
+					cout << "Specify WriterGroup ID to add DataSet to" << endl;
+					return 0;
+				}
+				wgID = b[B_WG];
+				status = KEY_FROM_SELECTED;
 			}
-			chID = b[B_CONN];
-			status = KEY_FROM_SELECTED;
-		}
 
-		map<UA_UInt16, BranchConnection>::iterator it;
-		if(tree.getChannel(chID, &it)) {
-			map<UA_UInt16, BranchWriterGroup>::iterator itwg;
-			if(it->second.getWritergroup(wgID, &itwg)) {
-				if(itwg->second.addDataset()) {
-					b[B_CONN] = chID;
-					b[B_WG] = wgID;
-					b[B_DTS] = itwg->second.dtsKeyInc;
-
-					current_conn = it->second;
-					current_wg = itwg->second;
-					current_dts = itwg->second.dts.at(b[B_DTS]);
-//					cout << "New added DS " << current_dts->key[B_DTS] << endl;
-
-					return 1;
+			if (status == KEY_FROM_INPUT) {
+				status = KEY_NOT_PROVIDED;
+				*ptr = strtok(NULL, delim);
+				if(*ptr != NULL) {
+					if(atoi(*ptr) != 0) {
+						chID = atoi(*ptr);
+						status = KEY_FROM_INPUT;
+					}
+					else  {
+						status = KEY_FROM_SELECTED;
+					}
 				}
 			}
-			else {
-				cout << "WriterGroup " << wgID << " does not exist" << endl;
-			}
-		}
 
-		else {
-			cout << "Channel " << chID << " does not exist" << endl;
-		}
-		return 0;
+
+			if (status != KEY_FROM_INPUT) {
+				if (b[B_CONN] == 0) {
+					cout << "Specify Channel ID to add DataSet to" << endl;
+					return 0;
+				}
+				chID = b[B_CONN];
+				status = KEY_FROM_SELECTED;
+			}
+
+			map<UA_UInt16, BranchConnection>::iterator it;
+			if(tree.getChannel(chID, &it)) {
+				map<UA_UInt16, BranchWriterGroup>::iterator itwg;
+				if(it->second.getWritergroup(wgID, &itwg)) {
+					if(itwg->second.addDataset()) {
+						b[B_CONN] = chID;
+						b[B_WG] = wgID;
+						b[B_DTS] = itwg->second.dtsKeyInc;
+
+						current_conn = it->second;
+						current_wg = itwg->second;
+						current_dts = itwg->second.dts.at(b[B_DTS]);
+	//					cout << "New added DS " << current_dts->key[B_DTS] << endl;
+
+						continue;
+					}
+				}
+				else {
+					cout << "WriterGroup " << wgID << " does not exist" << endl;
+				}
+			}
+
+			else {
+				cout << "Channel " << chID << " does not exist" << endl;
+			}
+
+		} while(status != KEY_FROM_SELECTED && *ptr != NULL && (*ptr = strtok(NULL, delim)) !=  NULL && atoi(*ptr) != 0);
 	}
 
 
@@ -872,41 +841,35 @@ int UserInput::addBranch(char **ptr) {
 			cout << "Provide string to be added" << endl;
 			return 0;
 		}
-
+		status = 0;
 		char buff[STRING_SIZE];
 
 		UA_UInt16 count = getStringFromCmd(buff, *ptr);
-
-//		cout << "count " << count << endl;
 
 		while (count-- > 0) {
 			*ptr = strtok(NULL, delim);
 
 			if(*ptr != NULL && strstr(*ptr, "\"") != NULL) {
-//				cout << " break" << endl;
 				*ptr = strtok(NULL, delim);
 				break;
 			}
 		}
 
-		bool cmdInQueue = false;
-		if(*ptr != NULL && atoi(*ptr) == 0)
-			cmdInQueue = true;
+		while(*ptr != NULL) {
+			if(addDataSetString(ptr, buff) == KEY_FROM_SELECTED) {
+				status = KEY_FROM_SELECTED;
+				break;
+			}
 
-		while(addDataSetString(ptr, buff) > -1) {
-			if(cmdInQueue || *ptr == NULL || (*ptr != NULL && atoi(*ptr) == 0))
-				return 1;
-
-			*ptr = strtok(NULL, delim);
-
-			if(*ptr == NULL || (*ptr != NULL && atoi(*ptr) == 0))
-				return 1;
+			if(*ptr == NULL || atoi(*ptr) != 0){
+				status = 0;
+				break;
+			}
 		}
-		return 0;
 	}
 
 
-	return 2;
+	return status;
 }
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -1011,7 +974,7 @@ int UserInput::addDataSetString(char **ptr, char *string) {
 
 				itwg->second.dts.at(b[B_DTS]).writeString(string);
 
-				return 1;
+				return status;
 			}
 		}
 		else {
@@ -1022,7 +985,7 @@ int UserInput::addDataSetString(char **ptr, char *string) {
 	else {
 		cout << "Channel " << chID << " does not exist" << endl;
 	}
-	return 0;
+	return status;
 }
 
 
@@ -1034,12 +997,6 @@ int UserInput::writeString(char **ptr, char *string) {
 
 
 	if(*ptr != NULL) {
-//		cout << "is not null" << endl;
-
-//		if(ptr != NULL)
-//		cout << "what is in ptr " << *ptr << endl;
-
-
 		if(atoi(*ptr) != 0) {
 			dsID = atoi(*ptr);
 			status = KEY_FROM_INPUT;
@@ -1050,7 +1007,6 @@ int UserInput::writeString(char **ptr, char *string) {
 	}
 
 	if (status != KEY_FROM_INPUT) {
-//		cout << "not from input" << endl;
 		if (b[B_DTS] == 0) {
 			cout << "Specify DataSet ID to write String" << endl;
 			return 0;
@@ -1060,7 +1016,6 @@ int UserInput::writeString(char **ptr, char *string) {
 	}
 
 	if (status == KEY_FROM_INPUT) {
-//		cout << "key from input 1" << endl;
 		status = KEY_NOT_PROVIDED;
 		*ptr = strtok(NULL, delim);
 		if(*ptr != NULL) {
@@ -1076,7 +1031,6 @@ int UserInput::writeString(char **ptr, char *string) {
 
 
 	if (status != KEY_FROM_INPUT) {
-//		cout << "not from input 2" << endl;
 		if (b[B_WG] == 0) {
 			cout << "Specify WriterGroup ID to write String" << endl;
 			return 0;
@@ -1086,7 +1040,6 @@ int UserInput::writeString(char **ptr, char *string) {
 	}
 
 	if (status == KEY_FROM_INPUT) {
-//		cout << "not from input 2" << endl;
 		status = KEY_NOT_PROVIDED;
 		*ptr = strtok(NULL, delim);
 		if(*ptr != NULL) {
@@ -1101,7 +1054,6 @@ int UserInput::writeString(char **ptr, char *string) {
 	}
 
 	if (status !=  KEY_FROM_INPUT) {
-//		cout << "not from input 3" << endl;
 		if (b[B_CONN] == 0) {
 			cout << "Specify Channel ID to write String" << endl;
 			return 0;
@@ -1116,7 +1068,7 @@ int UserInput::writeString(char **ptr, char *string) {
 			map<UA_UInt16, BranchDataSet>::iterator itdts;
 			if(itwg->second.getDataset(dsID, &itdts)) {
 				itdts->second.writeString(string);
-				return 1;
+				return status;
 			}
 			else {
 				cout << "String DataSet " << dsID << " does not exist in WriterGroup " << wgID << " of Channel " << chID << endl;
@@ -1129,7 +1081,7 @@ int UserInput::writeString(char **ptr, char *string) {
 	else {
 		cout << "Channel " << chID << " does not exist" << endl;
 	}
-	return 0;
+	return status;
 }
 
 
@@ -1137,245 +1089,16 @@ int UserInput::writeString(char **ptr, char *string) {
 int UserInput::addField(const UA_DataType *variableType, char **ptr) {
 	*ptr = strtok(NULL, delim);
 
-	UA_UInt16 dsID = 0;
-	UA_UInt16 wgID = 0;
-	UA_UInt16 chID = 0;
-	UA_Byte status = KEY_NOT_PROVIDED;
+	UA_UInt16 dsID;
+	UA_UInt16 wgID;
+	UA_UInt16 chID;
+	UA_Byte status;
 
-
-	if(*ptr != NULL) {
-		if(atoi(*ptr) != 0) {
-			dsID = atoi(*ptr);
-			status = KEY_FROM_INPUT;
-		}
-		else  {
-			status = KEY_FROM_SELECTED;
-		}
-	}
-
-	if (status != KEY_FROM_INPUT) {
-		if (b[B_DTS] == 0) {
-			cout << "Specify DataSet ID to add DataField to" << endl;
-			return 0;
-		}
-		dsID = b[B_DTS];
-		status = KEY_FROM_SELECTED;
-	}
-
-	if (status == KEY_FROM_INPUT) {
+	do {
+		dsID = 0;
+		wgID = 0;
+		chID = 0;
 		status = KEY_NOT_PROVIDED;
-		*ptr = strtok(NULL, delim);
-		if(*ptr != NULL) {
-			if(atoi(*ptr) != 0) {
-				wgID = atoi(*ptr);
-				status = KEY_FROM_INPUT;
-			}
-			else  {
-				status = KEY_FROM_SELECTED;
-			}
-		}
-	}
-
-
-	if (status != KEY_FROM_INPUT) {
-		if (b[B_WG] == 0) {
-			cout << "Specify WriterGroup ID to add DataField to" << endl;
-			return 0;
-		}
-		wgID = b[B_WG];
-		status = KEY_FROM_SELECTED;
-	}
-
-	if (status == KEY_FROM_INPUT) {
-		status = KEY_NOT_PROVIDED;
-		*ptr = strtok(NULL, delim);
-		if(*ptr != NULL) {
-			if(atoi(*ptr) != 0) {
-				chID = atoi(*ptr);
-				status = KEY_FROM_INPUT;
-			}
-			else  {
-				status = KEY_FROM_SELECTED;
-			}
-		}
-	}
-
-	if (status !=  KEY_FROM_INPUT) {
-		if (b[B_CONN] == 0) {
-			cout << "Specify Channel ID to add DataField to" << endl;
-			return 0;
-		}
-		chID = b[B_CONN];
-	}
-
-	map<UA_UInt16, BranchConnection>::iterator it;
-	if(tree.getChannel(chID, &it)) {
-		map<UA_UInt16, BranchWriterGroup>::iterator itwg;
-		if(it->second.getWritergroup(wgID, &itwg)) {
-
-			map<UA_UInt16, BranchDataSet>::iterator itdts;
-			if(itwg->second.getDataset(dsID, &itdts)) {
-
-				if (itdts->second.isString) {
-					cout << "Forbidden to directly manipulate String DataSet" << endl;
-					return 1;
-				}
-
-				if(itdts->second.addData(variableType)) {
-					b[B_CONN] = chID;
-					b[B_WG] = wgID;
-					b[B_DTS] = dsID;
-					b[B_VAR] = itdts->second.varKeyInc;
-
-					return 1;
-				}
-				else {
-					cout << " in DataSet " << dsID <<" of WriterGroup " << wgID << " in Channel " << chID << endl;
-				}
-			}
-			else {
-				cout << "DataSet " << dsID << " does not exist" << endl;
-			}
-		}
-		else {
-			cout << "WriterGroup " << wgID << " does not exist" << endl;
-		}
-	}
-	else {
-		cout << "Channel " << chID << " does not exist" << endl;
-	}
-	return 0;
-}
-
-
-/****************Remove Branch************************************************************************/
-int UserInput::removeBranch(char **ptr) {
-
-	if (*ptr == NULL) {
-		return -1;
-	}
-
-	if (strcmp(*ptr, "ch") == 0) {
-		*ptr = strtok(NULL, delim);
-		if (*ptr == NULL && b[B_CONN] == 0) {
-			cout << "Provide channel ID for removing" << endl;
-			return 0;
-		}
-
-		UA_UInt16 id = b[B_CONN];
-
-		if (*ptr != NULL && atoi(*ptr) != 0) {
-			id = atoi(*ptr);
-		}
-
-		string confirm;
-		cout << "Do you really want to delete Channel " << id << "? y/n ";
-		getInputString(&confirm);
-		if (confirm.compare("y") != 0)
-			return 1;
-
-		if(tree.deleteConnection(id)) {
-			b[B_CONN] = 0;
-			b[B_WG] = 0;
-			b[B_DTS] = 0;
-			b[B_VAR] = 0;
-
-
-			return 1;
-		}
-
-	}
-
-/**********************Remove WG************************************************************************/
-	else if (strcmp(*ptr, "wg") == 0) {
-		*ptr = strtok(NULL, delim);
-
-		UA_UInt16 wgID = 0;
-		UA_UInt16 chID = 0;
-		UA_Byte status = KEY_NOT_PROVIDED;
-
-
-		if(*ptr != NULL) {
-			if(atoi(*ptr) != 0) {
-				wgID = atoi(*ptr);
-				status = KEY_FROM_INPUT;
-			}
-			else  {
-				status = KEY_FROM_SELECTED;
-			}
-		}
-
-		if (status != KEY_FROM_INPUT) {
-			if (b[B_WG] == 0) {
-				cout << "Specify WriterGroup ID for removing" << endl;
-				return 0;
-			}
-			wgID = b[B_WG];
-			status = KEY_FROM_SELECTED;
-		}
-
-		if (status == KEY_FROM_INPUT) {
-			status = KEY_NOT_PROVIDED;
-			*ptr = strtok(NULL, delim);
-			if(*ptr != NULL) {
-				if(atoi(*ptr) != 0) {
-					chID = atoi(*ptr);
-					status = KEY_FROM_INPUT;
-				}
-				else  {
-					status = KEY_FROM_SELECTED;
-				}
-			}
-		}
-
-
-		if (status != KEY_FROM_INPUT) {
-			if (b[B_CONN] == 0) {
-				cout << "Specify Channel ID to remove WriterGroup from" << endl;
-				return 0;
-			}
-			chID = b[B_CONN];
-			status = KEY_FROM_SELECTED;
-		}
-
-		map<UA_UInt16, BranchConnection>::iterator it;
-		if(tree.getChannel(chID, &it)) {
-
-			string confirm;
-			cout << "Remove WriterGroup " << wgID << " from Channel " << chID << "? y/n ";
-			getInputString(&confirm);
-			if (confirm.compare("y") != 0) {
-				return 1;
-			}
-
-			if(it->second.removeWritergroup(wgID)) {
-				b[B_CONN] = chID;
-				b[B_WG] = 0;
-				b[B_DTS] = 0;
-				b[B_VAR] = 0;
-
-				return 1;
-			}
-			else {
-				cout << " in Channel " << chID << endl;
-			}
-		}
-		else {
-			cout << "Channel " << chID << " does not exist" << endl;
-		}
-		return 0;
-	}
-
-/*******************Remove Dataset*************************************************/
-
-	else if (strcmp(*ptr, "ds") == 0) {
-		*ptr = strtok(NULL, delim);
-
-		UA_UInt16 dsID = 0;
-		UA_UInt16 wgID = 0;
-		UA_UInt16 chID = 0;
-		UA_Byte status = KEY_NOT_PROVIDED;
-
 
 		if(*ptr != NULL) {
 			if(atoi(*ptr) != 0) {
@@ -1389,7 +1112,7 @@ int UserInput::removeBranch(char **ptr) {
 
 		if (status != KEY_FROM_INPUT) {
 			if (b[B_DTS] == 0) {
-				cout << "Specify DataSet ID for removing" << endl;
+				cout << "Specify DataSet ID to add DataField to" << endl;
 				return 0;
 			}
 			dsID = b[B_DTS];
@@ -1413,7 +1136,7 @@ int UserInput::removeBranch(char **ptr) {
 
 		if (status != KEY_FROM_INPUT) {
 			if (b[B_WG] == 0) {
-				cout << "Specify WriterGroup ID to remove DataSet from" << endl;
+				cout << "Specify WriterGroup ID to add DataField to" << endl;
 				return 0;
 			}
 			wgID = b[B_WG];
@@ -1436,136 +1159,7 @@ int UserInput::removeBranch(char **ptr) {
 
 		if (status !=  KEY_FROM_INPUT) {
 			if (b[B_CONN] == 0) {
-				cout << "Specify Channel ID to remove DataSet from" << endl;
-				return 0;
-			}
-			chID = b[B_CONN];
-		}
-
-		map<UA_UInt16, BranchConnection>::iterator it;
-		if(tree.getChannel(chID, &it)) {
-		map<UA_UInt16, BranchWriterGroup>::iterator itwg;
-			if(it->second.getWritergroup(wgID, &itwg)) {
-
-				string confirm;
-				cout << "Remove DataSet " << dsID << " from WriterGroup " << wgID << " of Channel " << chID << "? y/n ";
-				getInputString(&confirm);
-				if (confirm.compare("y") != 0) {
-					return 1;
-				}
-
-				if(itwg->second.removeDataset(dsID)) {
-					b[B_CONN] = chID;
-					b[B_WG] = wgID;
-					b[B_DTS] = 0;
-
-					return 1;
-				}
-				else {
-					cout << " in WriterGroup " << wgID << " of Channel " << chID << endl;
-				}
-			}
-			else {
-				cout << "WriterGroup " << wgID << " does not exist" << endl;
-			}
-		}
-		else {
-			cout << "Channel " << chID << " does not exist" << endl;
-		}
-		return 0;
-	}
-
-	/*******************Remove Field*************************************************/
-	else if (strcmp(*ptr, "fd") == 0) {
-		*ptr = strtok(NULL, delim);
-
-		UA_UInt16 fdID = 0;
-		UA_UInt16 dsID = 0;
-		UA_UInt16 wgID = 0;
-		UA_UInt16 chID = 0;
-		UA_Byte status = KEY_NOT_PROVIDED;
-
-
-		if(*ptr != NULL) {
-			if(atoi(*ptr) != 0) {
-				fdID = atoi(*ptr);
-				status = KEY_FROM_INPUT;
-			}
-			else  {
-				status = KEY_FROM_SELECTED;
-			}
-		}
-
-		if (status != KEY_FROM_INPUT) {
-			if (b[B_DTS] == 0) {
-				cout << "Specify Field ID for removing" << endl;
-				return 0;
-			}
-			fdID = b[B_VAR];
-			status = KEY_FROM_SELECTED;
-		}
-
-		if (status == KEY_FROM_INPUT) {
-			status = KEY_NOT_PROVIDED;
-			*ptr = strtok(NULL, delim);
-			if(*ptr != NULL) {
-				if(atoi(*ptr) != 0) {
-					dsID = atoi(*ptr);
-					status = KEY_FROM_INPUT;
-				}
-				else  {
-					status = KEY_FROM_SELECTED;
-				}
-			}
-		}
-		if (status != KEY_FROM_INPUT) {
-			if (b[B_DTS] == 0) {
-				cout << "Specify DataSet ID to remove Field from" << endl;
-				return 0;
-			}
-			dsID = b[B_DTS];
-			status = KEY_FROM_SELECTED;
-		}
-
-
-		if (status == KEY_FROM_INPUT) {
-			status = KEY_NOT_PROVIDED;
-			*ptr = strtok(NULL, delim);
-			if(*ptr != NULL) {
-				if(atoi(*ptr) != 0) {
-					wgID = atoi(*ptr);
-					status = KEY_FROM_INPUT;
-				}
-				else  {
-					status = KEY_FROM_SELECTED;
-				}
-			}
-		}
-		if (status != KEY_FROM_INPUT) {
-			if (b[B_WG] == 0) {
-				cout << "Specify WriterGroup ID to remove DataSet from" << endl;
-				return 0;
-			}
-			wgID = b[B_WG];
-			status = KEY_FROM_SELECTED;
-		}
-
-		if (status == KEY_FROM_INPUT) {
-			status = KEY_NOT_PROVIDED;
-			*ptr = strtok(NULL, delim);
-			if(*ptr != NULL) {
-				if(atoi(*ptr) != 0) {
-					chID = atoi(*ptr);
-					status = KEY_FROM_INPUT;
-				}
-				else  {
-					status = KEY_FROM_SELECTED;
-				}
-			}
-		}
-		if (status !=  KEY_FROM_INPUT) {
-			if (b[B_CONN] == 0) {
-				cout << "Specify Channel ID to remove DataSet from" << endl;
+				cout << "Specify Channel ID to add DataField to" << endl;
 				return 0;
 			}
 			chID = b[B_CONN];
@@ -1576,35 +1170,24 @@ int UserInput::removeBranch(char **ptr) {
 			map<UA_UInt16, BranchWriterGroup>::iterator itwg;
 			if(it->second.getWritergroup(wgID, &itwg)) {
 
-
 				map<UA_UInt16, BranchDataSet>::iterator itdts;
-
 				if(itwg->second.getDataset(dsID, &itdts)) {
 
 					if (itdts->second.isString) {
 						cout << "Forbidden to directly manipulate String DataSet" << endl;
-						return 2;
+						continue;
 					}
 
-					string confirm;
-					cout << "Remove Field " << fdID  << " from DataSet " << dsID << " in WriterGroup " << wgID << " of Channel " << chID << "? y/n ";
-					getInputString(&confirm);
-					if (confirm.compare("y") != 0) {
-						return 1;
-					}
-
-					if (itdts->second.removeData(fdID)) {
+					if(itdts->second.addData(variableType)) {
 						b[B_CONN] = chID;
 						b[B_WG] = wgID;
 						b[B_DTS] = dsID;
-						b[B_VAR] = 0;
+						b[B_VAR] = itdts->second.varKeyInc;
 
-						cout << "Field " << fdID  << " is removed from DataSet " << dsID << " in WriterGroup " << wgID << " of Channel " << chID << endl;
-
-						return 1;
+						continue;
 					}
 					else {
-						cout  << " in DataSet " << dsID << " of WriterGroup " << wgID << " in Channel " << chID << endl;
+						cout << " in DataSet " << dsID <<" of WriterGroup " << wgID << " in Channel " << chID << endl;
 					}
 				}
 				else {
@@ -1618,17 +1201,420 @@ int UserInput::removeBranch(char **ptr) {
 		else {
 			cout << "Channel " << chID << " does not exist" << endl;
 		}
-		return 0;
+
+	} while(status != KEY_FROM_SELECTED && *ptr != NULL && (*ptr = strtok(NULL, delim)) != NULL && atoi(*ptr) != 0);
+
+	return status;
+}
+
+
+/****************Remove Branch************************************************************************/
+int UserInput::removeBranch(char **ptr) {
+	UA_Byte status = NO_MATCHING_CMD;
+
+
+	if (strcmp(*ptr, "ch") == 0) {
+		*ptr = strtok(NULL, delim);
+			UA_UInt16 chID;
+
+		do {
+			chID = 0;
+			status = KEY_NOT_PROVIDED;
+			if (*ptr != NULL) {
+				 if(atoi(*ptr) != 0) {
+					 chID = atoi(*ptr);
+					 status = KEY_FROM_INPUT;
+				 } else {
+					 status = KEY_FROM_SELECTED;
+				 }
+			}
+
+			if(status != KEY_FROM_INPUT) {
+				if (b[B_CONN] == 0) {
+					cout << "Provide channel ID for removing" << endl;
+					return 0;
+				}
+				chID = b[B_CONN];
+				status = KEY_FROM_SELECTED;
+			}
+
+
+			string confirm;
+			cout << "Do you really want to delete Channel " << chID << "? y/n ";
+			getInputString(&confirm);
+			if (confirm.compare("y") != 0) {
+				continue;
+			}
+
+			if(tree.deleteConnection(chID)) {
+				b[B_CONN] = 0;
+				b[B_WG] = 0;
+				b[B_DTS] = 0;
+				b[B_VAR] = 0;
+				continue;
+			}
+			cout << "Could not remove Channel " << chID << endl;
+
+		} while(*ptr != NULL && (*ptr = strtok(NULL, delim)) != NULL && atoi(*ptr) != 0 && status != KEY_FROM_SELECTED);
+
 	}
 
+/**********************Remove WG************************************************************************/
+	else if (strcmp(*ptr, "wg") == 0) {
+		*ptr = strtok(NULL, delim);
+
+		do {
+
+			UA_UInt16 wgID = 0;
+			UA_UInt16 chID = 0;
+			status = KEY_NOT_PROVIDED;
+
+
+			if(*ptr != NULL) {
+				if(atoi(*ptr) != 0) {
+					wgID = atoi(*ptr);
+					status = KEY_FROM_INPUT;
+				}
+				else  {
+					status = KEY_FROM_SELECTED;
+				}
+			}
+
+			if (status != KEY_FROM_INPUT) {
+				if (b[B_WG] == 0) {
+					cout << "Specify WriterGroup ID for removing" << endl;
+					return 0;
+				}
+				wgID = b[B_WG];
+				status = KEY_FROM_SELECTED;
+			}
+
+			if (status == KEY_FROM_INPUT) {
+				status = KEY_NOT_PROVIDED;
+				*ptr = strtok(NULL, delim);
+				if(*ptr != NULL) {
+					if(atoi(*ptr) != 0) {
+						chID = atoi(*ptr);
+						status = KEY_FROM_INPUT;
+					}
+					else  {
+						status = KEY_FROM_SELECTED;
+					}
+				}
+			}
+
+
+			if (status != KEY_FROM_INPUT) {
+				if (b[B_CONN] == 0) {
+					cout << "Specify Channel ID to remove WriterGroup from" << endl;
+					return 0;
+				}
+				chID = b[B_CONN];
+				status = KEY_FROM_SELECTED;
+			}
+
+			map<UA_UInt16, BranchConnection>::iterator it;
+			if(tree.getChannel(chID, &it)) {
+
+				string confirm;
+				cout << "Remove WriterGroup " << wgID << " from Channel " << chID << "? y/n ";
+				getInputString(&confirm);
+				if (confirm.compare("y") != 0) {
+					continue;
+				}
+
+				if(it->second.removeWritergroup(wgID)) {
+					b[B_CONN] = chID;
+					b[B_WG] = 0;
+					b[B_DTS] = 0;
+					b[B_VAR] = 0;
+					continue;
+				}
+				else {
+					cout << " in Channel " << chID;
+				}
+			}
+			else {
+				cout << "Channel " << chID << " does not exist";
+			}
+			cout << ". Could not remove WriterGroup " << wgID << endl;
+		} while(*ptr != NULL && (*ptr = strtok(NULL, delim)) != NULL && atoi(*ptr) != 0 && status != KEY_FROM_SELECTED);
+
+	}
+
+/*******************Remove Dataset*************************************************/
+
+	else if (strcmp(*ptr, "ds") == 0) {
+		*ptr = strtok(NULL, delim);
+
+
+		do {
+			UA_UInt16 dsID = 0;
+			UA_UInt16 wgID = 0;
+			UA_UInt16 chID = 0;
+			status = KEY_NOT_PROVIDED;
+
+			if(*ptr != NULL) {
+				if(atoi(*ptr) != 0) {
+					dsID = atoi(*ptr);
+					status = KEY_FROM_INPUT;
+				}
+				else  {
+					status = KEY_FROM_SELECTED;
+				}
+			}
+
+			if (status != KEY_FROM_INPUT) {
+				if (b[B_DTS] == 0) {
+					cout << "Specify DataSet ID for removing" << endl;
+					return 0;
+				}
+				dsID = b[B_DTS];
+				status = KEY_FROM_SELECTED;
+			}
+
+			if (status == KEY_FROM_INPUT) {
+				status = KEY_NOT_PROVIDED;
+				*ptr = strtok(NULL, delim);
+				if(*ptr != NULL) {
+					if(atoi(*ptr) != 0) {
+						wgID = atoi(*ptr);
+						status = KEY_FROM_INPUT;
+					}
+					else  {
+						status = KEY_FROM_SELECTED;
+					}
+				}
+			}
+
+
+			if (status != KEY_FROM_INPUT) {
+				if (b[B_WG] == 0) {
+					cout << "Specify WriterGroup ID to remove DataSet from" << endl;
+					return 0;
+				}
+				wgID = b[B_WG];
+				status = KEY_FROM_SELECTED;
+			}
+
+			if (status == KEY_FROM_INPUT) {
+				status = KEY_NOT_PROVIDED;
+				*ptr = strtok(NULL, delim);
+				if(*ptr != NULL) {
+					if(atoi(*ptr) != 0) {
+						chID = atoi(*ptr);
+						status = KEY_FROM_INPUT;
+					}
+					else  {
+						status = KEY_FROM_SELECTED;
+					}
+				}
+			}
+
+			if (status !=  KEY_FROM_INPUT) {
+				if (b[B_CONN] == 0) {
+					cout << "Specify Channel ID to remove DataSet from" << endl;
+					return 0;
+				}
+				chID = b[B_CONN];
+			}
+
+			map<UA_UInt16, BranchConnection>::iterator it;
+			if(tree.getChannel(chID, &it)) {
+			map<UA_UInt16, BranchWriterGroup>::iterator itwg;
+				if(it->second.getWritergroup(wgID, &itwg)) {
+
+					string confirm;
+					cout << "Remove DataSet " << dsID << " from WriterGroup " << wgID << " of Channel " << chID << "? y/n ";
+					getInputString(&confirm);
+					if (confirm.compare("y") != 0) {
+						continue;
+					}
+
+					if(itwg->second.removeDataset(dsID)) {
+						b[B_CONN] = chID;
+						b[B_WG] = wgID;
+						b[B_DTS] = 0;
+
+						continue;
+					}
+					else {
+						cout << " in WriterGroup " << wgID << " of Channel " << chID;
+					}
+				}
+				else {
+					cout << "WriterGroup " << wgID << " does not exist";
+				}
+			}
+			else {
+				cout << "Channel " << chID << " does not exist";
+			}
+			cout << ". Could not remove DataSet " << dsID << endl;
+
+		} while(*ptr != NULL && (*ptr = strtok(NULL, delim)) != NULL && atoi(*ptr) != 0 && status != KEY_FROM_SELECTED);
+
+	}
+
+	/*******************Remove Field*************************************************/
+	else if (strcmp(*ptr, "fd") == 0) {
+		*ptr = strtok(NULL, delim);
+
+		do {
+			UA_UInt16 fdID = 0;
+			UA_UInt16 dsID = 0;
+			UA_UInt16 wgID = 0;
+			UA_UInt16 chID = 0;
+			status = KEY_NOT_PROVIDED;
+
+
+			if(*ptr != NULL) {
+				if(atoi(*ptr) != 0) {
+					fdID = atoi(*ptr);
+					status = KEY_FROM_INPUT;
+				}
+				else  {
+					status = KEY_FROM_SELECTED;
+				}
+			}
+
+			if (status != KEY_FROM_INPUT) {
+				if (b[B_DTS] == 0) {
+					cout << "Specify Field ID for removing" << endl;
+					return 0;
+				}
+				fdID = b[B_VAR];
+				status = KEY_FROM_SELECTED;
+			}
+
+			if (status == KEY_FROM_INPUT) {
+				status = KEY_NOT_PROVIDED;
+				*ptr = strtok(NULL, delim);
+				if(*ptr != NULL) {
+					if(atoi(*ptr) != 0) {
+						dsID = atoi(*ptr);
+						status = KEY_FROM_INPUT;
+					}
+					else  {
+						status = KEY_FROM_SELECTED;
+					}
+				}
+			}
+			if (status != KEY_FROM_INPUT) {
+				if (b[B_DTS] == 0) {
+					cout << "Specify DataSet ID to remove Field from" << endl;
+					return 0;
+				}
+				dsID = b[B_DTS];
+				status = KEY_FROM_SELECTED;
+			}
+
+
+			if (status == KEY_FROM_INPUT) {
+				status = KEY_NOT_PROVIDED;
+				*ptr = strtok(NULL, delim);
+				if(*ptr != NULL) {
+					if(atoi(*ptr) != 0) {
+						wgID = atoi(*ptr);
+						status = KEY_FROM_INPUT;
+					}
+					else  {
+						status = KEY_FROM_SELECTED;
+					}
+				}
+			}
+			if (status != KEY_FROM_INPUT) {
+				if (b[B_WG] == 0) {
+					cout << "Specify WriterGroup ID to remove DataSet from" << endl;
+					return 0;
+				}
+				wgID = b[B_WG];
+				status = KEY_FROM_SELECTED;
+			}
+
+			if (status == KEY_FROM_INPUT) {
+				status = KEY_NOT_PROVIDED;
+				*ptr = strtok(NULL, delim);
+				if(*ptr != NULL) {
+					if(atoi(*ptr) != 0) {
+						chID = atoi(*ptr);
+						status = KEY_FROM_INPUT;
+					}
+					else  {
+						status = KEY_FROM_SELECTED;
+					}
+				}
+			}
+			if (status !=  KEY_FROM_INPUT) {
+				if (b[B_CONN] == 0) {
+					cout << "Specify Channel ID to remove DataSet from" << endl;
+					return 0;
+				}
+				chID = b[B_CONN];
+			}
+
+			map<UA_UInt16, BranchConnection>::iterator it;
+			if(tree.getChannel(chID, &it)) {
+				map<UA_UInt16, BranchWriterGroup>::iterator itwg;
+				if(it->second.getWritergroup(wgID, &itwg)) {
+
+
+					map<UA_UInt16, BranchDataSet>::iterator itdts;
+
+					if(itwg->second.getDataset(dsID, &itdts)) {
+
+						if (itdts->second.isString) {
+							cout << "Forbidden to directly manipulate String DataSet" << endl;
+							continue;
+						}
+
+						string confirm;
+						cout << "Remove Field " << fdID  << " from DataSet " << dsID << " in WriterGroup " << wgID << " of Channel " << chID << "? y/n ";
+						getInputString(&confirm);
+						if (confirm.compare("y") != 0) {
+							continue;
+						}
+
+						if (itdts->second.removeData(fdID)) {
+							b[B_CONN] = chID;
+							b[B_WG] = wgID;
+							b[B_DTS] = dsID;
+							b[B_VAR] = 0;
+
+							UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Field %d removed\n", fdID);
+//							cout << "Field " << fdID  << " is removed from DataSet " << dsID << " in WriterGroup " << wgID << " of Channel " << chID << endl;
+
+							continue;
+						}
+						else {
+							cout  << " in DataSet " << dsID << " of WriterGroup " << wgID << " in Channel " << chID;
+						}
+					}
+					else {
+						cout << "DataSet " << dsID << " does not exist";
+					}
+				}
+				else {
+					cout << "WriterGroup " << wgID << " does not exist";
+				}
+			}
+			else {
+				cout << "Channel " << chID << " does not exist";
+			}
+
+			cout << ". Could not remove Field " << fdID << endl;
+
+		} while(*ptr != NULL && (*ptr = strtok(NULL, delim)) !=  NULL && atoi(*ptr) != 0 && status != KEY_FROM_SELECTED);
+
+	}
 
 	else if (strcmp(*ptr, "all") == 0) {
+		*ptr = strtok(NULL, delim);
 
 		string confirm;
 		cout << "Remove all Connections? y/n ";
 		getInputString(&confirm);
 		if (confirm.compare("y") != 0) {
-			return 1;
+			return 0;
 		}
 
 		b[B_CONN] = 0;
@@ -1636,11 +1622,9 @@ int UserInput::removeBranch(char **ptr) {
 		b[B_DTS] = 0;
 		b[B_VAR] = 0;
 		tree.deleteAllConnections();
-
-		*ptr = strtok(NULL, delim);
 	}
 
-	return 2;
+	return status;
 }
 
 
@@ -1757,7 +1741,7 @@ int UserInput::writeVariable(char **ptr) {
 				map<UA_UInt16, BranchField>::iterator itfd;
 				if (itdts->second.getField(fdID, &itfd)) {
 					itfd->second.writeValue(value);
-					return 1;
+					return status;
 				}
 				else {
 
@@ -2017,7 +2001,7 @@ int UserInput::enablePublish(char **ptr) {
 
 
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////WORKING ONLY FOR EXAMPLES/////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /******************DISABLE*************************************************************/
@@ -2517,7 +2501,7 @@ void UserInput::printHelp() {
 	cout << "   \ton       ch <ch ID>" << endl;
 	cout << "   \ton       port <port>" << endl;
 	cout << endl;
-	cout << "10. \toff      <wg ID> <ch ID>" << endl;
+	cout << "10.\toff      <wg ID> <ch ID>" << endl;
 	cout << "   \toff      all" << endl;
 	cout << "   \toff      ch <ch ID>" << endl;
 	cout << "   \toff      port <port>" << endl;

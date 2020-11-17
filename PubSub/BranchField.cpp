@@ -17,7 +17,7 @@ BranchField::BranchField() : variableType() {
 	// TODO Auto-generated constructor stub
 }
 
-BranchField::BranchField(UA_UInt16 *b, const UA_DataType *variableType, UA_NodeId &dataSet)
+BranchField::BranchField(UA_UInt16 *b, const UA_DataType *variableType, UA_NodeId &dataSet, UA_Boolean isString)
 : key{b[B_CONN], b[B_WG], b[B_DTS], b[B_VAR]}, variableType(variableType) {
 //	cout << BranchField::count << ". DataField added with token " << this->key[B_CONN] << "-" << this->key[B_WG] << "-" << this->key[B_DTS] << "-" << this->key[B_VAR] << endl;
 //	cout << BranchField::count << ". DataField added with token " << this->key[B_CONN] << "-" << this->key[B_WG] << "-" << this->key[B_DTS] << "-" << this->key[B_VAR] << endl;
@@ -30,6 +30,7 @@ BranchField::BranchField(UA_UInt16 *b, const UA_DataType *variableType, UA_NodeI
 		dataSetField = pub->addDataSetField(dataSet, var);
 	}
 
+	if (!isString)
 	cout << "\tFD " << this->key[B_VAR]  << " added to DS " << this->key[B_DTS] << " in WG " << this->key[B_WG] << " of CH " << this->key[B_CONN] << "  Total Field: " << BranchField::count << endl;
 
 }

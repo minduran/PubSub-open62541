@@ -39,7 +39,7 @@ bool BranchDataSet::addData(const UA_DataType *variableType) {
 	if(!fieldExists(varKeyInc)) {
 		BranchField::count++;
 		key[B_VAR] = varKeyInc;
-		BranchField fld(key, variableType, dataSet);
+		BranchField fld(key, variableType, dataSet, isString);
 //		fld.var = pub->addVariable(variableType);
 //		fld.dataSetField = pub->addDataSetField(dataSet, fld.var);
 		fields.insert(pair<UA_UInt16, BranchField>(varKeyInc, fld));

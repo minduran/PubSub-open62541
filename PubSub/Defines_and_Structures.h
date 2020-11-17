@@ -50,6 +50,8 @@ typedef struct {
 #define KEY_FROM_INPUT			1
 #define KEY_FROM_SELECTED		2
 
+#define NO_MATCHING_CMD			3
+
 
 #define VARIABLE_NUMBER			11
 #define WRITERGROUP_NUMBER		12
