@@ -208,13 +208,14 @@ void UserInput::decode(char *cmdLine) {
 			ifstream file;
 
 			if (ptr == NULL) {
-				cout << "Specify file location" << endl;
+//				cout << "Specify file location" << endl;
 				const char *def= "pubsub.txt";
 				UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Open script file '%s'!", def);
 				file.open(def);
 			} else {
 				file.open(ptr);
 				UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Open script file '%s'!", ptr);
+				ptr = strtok(NULL, delim);
 			}
 
 			string lineText;
@@ -375,12 +376,13 @@ void UserInput::decode(char *cmdLine) {
 			if(ptr != NULL && atoi(ptr) == 0) {
 				if(strcmp(ptr,"all") == 0) {
 					tree.enableAllWg();
+					ptr = strtok(NULL, delim);
 					continue;
 				}
 				else if(strcmp(ptr,"ch") == 0) {
 					ptr = strtok(NULL, delim);
 					if(ptr == NULL) {
-						cout << "Channel ID to update interval of its WriterGroups" << endl;
+						cout << "Provide Channel ID to update interval of its WriterGroups" << endl;
 						continue;
 					}
 					UA_UInt16 chID;
@@ -396,7 +398,7 @@ void UserInput::decode(char *cmdLine) {
 				else if(strcmp(ptr,"port") == 0) {
 					ptr = strtok(NULL, delim);
 					if(ptr == NULL) {
-						cout << "Channel port to update interval of its WriterGroups" << endl;
+						cout << "Provide Channel port to update interval of its WriterGroups" << endl;
 						continue;
 					}
 					UA_UInt16 port;
@@ -427,12 +429,13 @@ void UserInput::decode(char *cmdLine) {
 			if(ptr != NULL && atoi(ptr) == 0) {
 				if(strcmp(ptr,"all") == 0) {
 					tree.disableAllWg();
+					ptr = strtok(NULL, delim);
 					continue;
 				}
 				else if(strcmp(ptr,"ch") == 0) {
 					ptr = strtok(NULL, delim);
 					if(ptr == NULL) {
-						cout << "Channel ID to update interval of its WriterGroups" << endl;
+						cout << "Provide Channel ID to update interval of its WriterGroups" << endl;
 						continue;
 					}
 					UA_UInt16 chID;
@@ -448,7 +451,7 @@ void UserInput::decode(char *cmdLine) {
 				else if(strcmp(ptr,"port") == 0) {
 					ptr = strtok(NULL, delim);
 					if(ptr == NULL) {
-						cout << "Channel port to update interval of its WriterGroups" << endl;
+						cout << "Provide Channel port to update interval of its WriterGroups" << endl;
 						continue;
 					}
 					UA_UInt16 port;
@@ -486,6 +489,7 @@ void UserInput::decode(char *cmdLine) {
 				}
 				UA_UInt16 interval = atoi(ptr);
 				tree.updateAllWg(interval);
+				ptr = strtok(NULL, delim);
 				continue;
 			}
 
@@ -511,7 +515,7 @@ void UserInput::decode(char *cmdLine) {
 			else if(ptr != NULL && strcmp(ptr,"port") == 0) {
 				ptr = strtok(NULL, delim);
 				if(ptr == NULL) {
-					cout << "Channel port to update interval of its WriterGroups" << endl;
+					cout << "Provide Channel port to update interval of its WriterGroups" << endl;
 					continue;
 				}
 				UA_UInt16 port;
@@ -568,8 +572,7 @@ void UserInput::decode(char *cmdLine) {
 		} else {
 			if(ptr == NULL || ptr[0] != '"') {
 				if(ptr != NULL) {
-					UA_LOG_ERROR(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
-					                       "%s is an invalid command", ptr);
+				    cout << "'" << ptr <<"' is an invalid command" << endl;
 					ptr = strtok(NULL, delim);
 				}
 				continue;
@@ -640,6 +643,9 @@ int UserInput::addBranch(char **ptr) {
 
 			if(tree.createConnection(port)) {
 				b[B_CONN] = tree.connKeyInc;
+				b[B_WG] = 0;
+				b[B_DTS] = 0;
+				b[B_VAR] = 0;
 				current_conn = tree.conns.at(tree.connKeyInc);
 	//			cout << "New added Ch " << current_conn->port << endl;
 			}
@@ -682,6 +688,8 @@ int UserInput::addBranch(char **ptr) {
 				if(it->second.addWritergroup()) {
 					b[B_CONN] = chID;
 					b[B_WG] = it->second.wgKeyInc;
+					b[B_DTS] = 0;
+					b[B_VAR] = 0;
 
 
 					current_conn = it->second;
@@ -762,6 +770,7 @@ int UserInput::addBranch(char **ptr) {
 						b[B_CONN] = chID;
 						b[B_WG] = wgID;
 						b[B_DTS] = itwg->second.dtsKeyInc;
+						b[B_VAR] = 0;
 
 						current_conn = it->second;
 						current_wg = itwg->second;
@@ -1387,6 +1396,7 @@ int UserInput::removeBranch(char **ptr) {
 						b[B_CONN] = chID;
 						b[B_WG] = wgID;
 						b[B_DTS] = 0;
+						b[B_VAR] = 0;
 
 						continue;
 					}
@@ -1805,7 +1815,6 @@ int UserInput::disablePublish(char **ptr) {
 		map<UA_UInt16, BranchWriterGroup>::iterator itwg;
 		if(it->second.getWritergroup(wgID, &itwg)) {
 			itwg->second.disable();
-			cout << "WG " << wgID << " of Channel " << chID << " disabled publishing" << endl;
 
 //			b[B_CONN] = chID;
 //			b[B_WG] = wgID;
@@ -1814,12 +1823,6 @@ int UserInput::disablePublish(char **ptr) {
 
 			return status;
 		}
-		else {
-			cout << " in Channel " << chID << endl;
-		}
-	}
-	else {
-		cout << "Channel " << chID << " does not exist" << endl;
 	}
 	return 0;
 
@@ -1884,7 +1887,6 @@ int UserInput::enablePublish(char **ptr) {
 		map<UA_UInt16, BranchWriterGroup>::iterator itwg;
 		if(it->second.getWritergroup(wgID, &itwg)) {
 			itwg->second.enable();
-			cout << "WG " << wgID << " of Channel " << chID << " enabled publishing" << endl;
 
 //			b[B_CONN] = chID;
 //			b[B_WG] = wgID;
@@ -1893,12 +1895,6 @@ int UserInput::enablePublish(char **ptr) {
 
 			return status;
 		}
-		else {
-			cout << " in Channel " << chID << endl;
-		}
-	}
-	else {
-		cout << "Channel " << chID << " does not exist" << endl;
 	}
 	return 0;
 

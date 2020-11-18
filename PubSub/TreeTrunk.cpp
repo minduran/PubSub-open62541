@@ -131,7 +131,7 @@ void TreeTrunk::showChannels() {
 	map<UA_UInt16, BranchConnection>::iterator it = conns.begin();
 	while (it != conns.end()) {
 		it->second.print();
-		cout << endl;
+//		cout << endl;
 		it->second.showWritergroups();
 		it++;
 	}
@@ -154,22 +154,30 @@ void TreeTrunk::disableWriterGroupOfChannel(UA_UInt16 chKey) {
 
 void TreeTrunk::disableWriterGroupOfPort(UA_UInt16 port) {
 	map<UA_UInt16, BranchConnection>::iterator it = conns.begin();
+	UA_Boolean found = false;
 	while(it != conns.end()) {
 		if(it->second.port == port) {
 			it->second.disableAllWg();
+			found = true;
 		}
 		it++;
 	}
+	if(!found)
+		UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "No Channel on port %u found", port);
 }
 
 void TreeTrunk::enableWriterGroupOfPort(UA_UInt16 port) {
 	map<UA_UInt16, BranchConnection>::iterator it = conns.begin();
+	UA_Boolean found = false;
 	while(it != conns.end()) {
 		if(it->second.port == port) {
 			it->second.enableAllWg();
+			found = true;
 		}
 		it++;
 	}
+	if(!found)
+		UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "No Channel on port %u found", port);
 }
 
 void TreeTrunk::disableAllWg() {
@@ -209,11 +217,15 @@ void TreeTrunk::updateWriterGroupOfChannel(UA_UInt16 chKey, UA_UInt16 interval) 
 
 void TreeTrunk::updateWriterGroupOfPort(UA_UInt16 port, UA_UInt16 interval) {
 	map<UA_UInt16, BranchConnection>::iterator it = conns.begin();
+	UA_Boolean found = false;
 	while(it != conns.end()) {
 		if(it->second.port == port) {
-			cout << "Update Intervals of WriterGroups on Channel port" << port << endl;
+			cout << "Update Intervals of WriterGroups on Channel port " << port << endl;
 			it->second.setIntervalOnAllWg(interval);
+			found = true;
 		}
 		it++;
 	}
+	if (!found)
+		UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "No Channel on port %u found", port);
 }

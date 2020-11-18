@@ -90,7 +90,7 @@ bool BranchConnection::getWritergroup(UA_UInt16 wgKey,
 }
 
 void BranchConnection::print() {
-	cout << "\nChannel " << key[B_CONN] << " on Port " << port << endl;
+	cout << "Channel " << key[B_CONN] << " on Port " << port << endl;
 }
 
 void BranchConnection::showWritergroups() {

@@ -27,7 +27,7 @@ BranchDataSet::BranchDataSet(UA_UInt16 connKey, UA_UInt16 wgKey, UA_UInt16 key)
 BranchDataSet::BranchDataSet(UA_UInt16 connKey, UA_UInt16 wgKey, UA_UInt16 key, UA_Boolean isString)
 : isString(isString), key{connKey, wgKey, key}, varKeyInc(0) {
 	UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND,
-					"String DS %u %u %u added.    Total DataSets: %u",  this->key[B_DTS],  this->key[B_WG],  this->key[B_CONN], count);
+					"DS %u %u %u added (String)",  this->key[B_DTS],  this->key[B_WG],  this->key[B_CONN]);
 //	cout << "\tDS " << this->key[B_DTS]  << " added to WG " << this->key[B_WG] << " of CH " << this->key[B_CONN] <<  "   Total DS: "<< this->count <<endl;
 }
 
@@ -96,7 +96,7 @@ void BranchDataSet::print() {
 
 void BranchDataSet::writeString(char *string) {
 	if (isString) {
-		UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Writing Content: %s", string);
+		UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Writing Content: '%s'", string);
 		if(fields.size() > 0) {
 			map<UA_UInt16, BranchField>::iterator it = fields.begin();
 			UA_UInt16 i = 0;

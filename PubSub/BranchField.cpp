@@ -45,22 +45,22 @@ void BranchField::init(Publisher *pub) {
 void BranchField::writeValue(char *val) {
 	if(variableType == VAR_TYPE_DOUBLE) {
 		UA_Double value = (UA_Double) atof(val);
-		cout << "DOUBLE set to " << val << endl;
+		UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "FD %u %u %u %u: Double set to %s", key[B_VAR], key[B_DTS], key[B_WG], key[B_CONN], val);
 		pub->writeVariable(&value, var, variableType);
 	}
 	else if(variableType == VAR_TYPE_FLOAT) {
 		UA_Float value = (UA_Float) atof(val);
-		cout << "FLOAT set to " << val << endl;
+		UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "FD %u %u %u %u: Float set to %s", key[B_VAR], key[B_DTS], key[B_WG], key[B_CONN], val);
 		pub->writeVariable(&value, var, variableType);
 	}
 	else if(variableType == VAR_TYPE_BOOLEAN) {
 		static UA_Boolean value = false;
 		if (strcmp(val, "true") == 0 || strcmp(val, "1") == 0) {
-			cout << "BOOLEAN set to true" << endl;
+			UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "FD %u %u %u %u: Boolean set to true", key[B_VAR], key[B_DTS], key[B_WG], key[B_CONN]);
 			value = true;
 		}
 		else if (strcmp(val, "false") == 0 || strcmp(val, "0") == 0) {
-			cout << "BOOLEAN set to false" << endl;
+			UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "FD %u %u %u %u: Boolean set to false", key[B_VAR], key[B_DTS], key[B_WG], key[B_CONN]);
 			value = false;
 		}
 		else {
@@ -70,42 +70,42 @@ void BranchField::writeValue(char *val) {
 	}
 	else if(variableType == VAR_TYPE_BYTE) {
 		UA_Byte value = (UA_Byte) atoi(val);
-		cout << "BYTE set to " << (UA_Int16) value << endl;
+		UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "FD %u %u %u %u: Byte set to %s", key[B_VAR], key[B_DTS], key[B_WG], key[B_CONN], val);
 		pub->writeVariable(&value, var, variableType);
 	}
 	else if(variableType == VAR_TYPE_SBYTE) {
 		UA_SByte value = (UA_SByte) atoi(val);
-		cout << "SIGNED BYTE set to " << (UA_UInt16) value << endl;
+		UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "FD %u %u %u %u: Signed Byte set to %s", key[B_VAR], key[B_DTS], key[B_WG], key[B_CONN], val);
 		pub->writeVariable(&value, var, variableType);
 	}
 	else if(variableType == VAR_TYPE_INT32) {
 		UA_Int32 value = (UA_Int32) atoi(val);
-		cout << "INT 32 set to " << value << endl;
+		UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "FD %u %u %u %u: Int 32 set to %s", key[B_VAR], key[B_DTS], key[B_WG], key[B_CONN], val);
 		pub->writeVariable(&value, var, variableType);
 	}
 	else if(variableType == VAR_TYPE_UINT32) {
 		UA_UInt32 value = (UA_UInt32) atoi(val);
-		cout << "UNSIGNED INT 32 set to " << value << endl;
+		UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "FD %u %u %u %u: Unsigned Int 32 set to %s", key[B_VAR], key[B_DTS], key[B_WG], key[B_CONN], val);
 		pub->writeVariable(&value, var, variableType);
 	}
 	else if(variableType == VAR_TYPE_INT16) {
 		UA_Int16 value = (UA_Int16) atoi(val);
-		cout << "INT 16 set to " << value << endl;
+		UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "FD %u %u %u %u: Int 16 set to %s", key[B_VAR], key[B_DTS], key[B_WG], key[B_CONN], val);
 		pub->writeVariable(&value, var, variableType);
 	}
 	else if(variableType == VAR_TYPE_UINT16) {
 		UA_UInt16 value = (UA_UInt16) atoi(val);
-		cout << "UNSIGNED INT 16 set to " << value << endl;
+		UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "FD %u %u %u %u: Unsigned Int 16 set to %s", key[B_VAR], key[B_DTS], key[B_WG], key[B_CONN], val);
 		pub->writeVariable(&value, var, variableType);
 	}
 	else if(variableType == VAR_TYPE_INT64) {
 		UA_Int64 value = (UA_Int64) atoi(val);
-		cout << "INT 64 set to " << value << endl;
+		UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "FD %u %u %u %u: Int 64 set to %s", key[B_VAR], key[B_DTS], key[B_WG], key[B_CONN], val);
 		pub->writeVariable(&value, var, variableType);
 	}
 	else if(variableType == VAR_TYPE_UINT64) {
 		UA_UInt64 value = (UA_UInt64) atoi(val);
-		cout << "UNSIGNED INT 64 set to " << value << endl;
+		UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "FD %u %u %u %u: Unsigned Int 64 set to %s", key[B_VAR], key[B_DTS], key[B_WG], key[B_CONN], val);
 		pub->writeVariable(&value, var, variableType);
 	}
 
