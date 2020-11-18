@@ -1,0 +1,19 @@
+add ch 1234 wg wg wg wg wg wg wg wg wg wg
+add ch 5454 wg wg add ch 1258 wg wg wg wg 
+add ch 3663 wg wg s s s s s s 
+add ch 9898 wg wg ds ds 1 1 ds 1 2 ds 2 3 wg wg ds wg
+rm wg wg 2 wg 3 wg 4 wg 5
+add ch 3256 wg ds ds wg ds ds ds wg wg ds
+add ch 4860 wg ds bool float int32 double byte uint64
+wrt true 1 wrt 1.234 2 wrt 3 3 wrt 9.054 4 wrt 255 5 wrt 9999 6
+add ch 4843 wg ds bool wg ds byte wrt 13
+add ch 4842 wg string "hello world!"
+add string "something new" string "just for fun" string "I am tired of debugging" string "how can this weird behavior even be possible"
+intv 1000
+add ch 4841 wg intv 1000 add string "Hello Sunshine!" ds bool wrt true add date
+add ch 9999 wg ds bool byte wg ds float ds double wg ds date wg string "some" 1 1 1 2 bool bool float float
+show
+rm fd 4 1 4 2 1 1 2 2 ds 1 3 2 add wg ds float
+rm fd 1  1 3 2 ds 1 4  2 add wg
+rm ds 1 1 2 wg 1 1 1 2 add ch 1234
+add ch 4840 wg string "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor"

@@ -43,7 +43,7 @@ typedef struct {
 #define B_DTS					2
 #define B_VAR					3
 
-#define STRING_SIZE				1024
+#define STRING_SIZE				242
 
 
 #define KEY_NOT_PROVIDED		0

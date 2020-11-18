@@ -207,9 +207,9 @@ void UserInput::decode(char *cmdLine) {
 
 			ifstream file;
 
+			const char *def= "pubsub.txt";
 			if (ptr == NULL) {
 //				cout << "Specify file location" << endl;
-				const char *def= "pubsub.txt";
 				UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Open script file '%s'!", def);
 				file.open(def);
 			} else {
@@ -235,7 +235,7 @@ void UserInput::decode(char *cmdLine) {
 				file.close();
 				continue;
 			}
-			UA_LOG_ERROR(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Could not open script file '%s'!", ptr);
+			UA_LOG_ERROR(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Could not open script file '%s'!", ptr == NULL ? def : ptr);
 
 		}
 
@@ -528,13 +528,14 @@ void UserInput::decode(char *cmdLine) {
 				continue;
 			}
 
-			while(ptr!= NULL) {
+			do {
 				if(updateInterval(&ptr, interval) == KEY_FROM_SELECTED)
 					break;
 				if(ptr == NULL || atoi(ptr) != 0)
 					break;
 				ptr = strtok(NULL, delim);
-			}
+			} while(ptr!= NULL);
+
 			continue;
 		} else if (strcmp(ptr, "wrtstr") == 0) {
 			ptr = strtok(NULL, delim);
@@ -557,14 +558,13 @@ void UserInput::decode(char *cmdLine) {
 				}
 			}
 
-
-			while(ptr != NULL && atoi(ptr) != 0) {
+			do {
 				if(writeString(&ptr, buff) == KEY_FROM_SELECTED)
 					break;
 				if(ptr == NULL)
 					break;
 				ptr = strtok(NULL, delim);
-			}
+			} while(ptr != NULL && atoi(ptr) != 0);
 
 
 			continue;
@@ -577,7 +577,7 @@ void UserInput::decode(char *cmdLine) {
 				}
 				continue;
 			}
-			cmdLength += strlen(ptr);
+			cmdLength += strlen(ptr) + 1;
 
 			char buff[STRING_SIZE];
 
@@ -592,15 +592,13 @@ void UserInput::decode(char *cmdLine) {
 				}
 			}
 
-
-			while(writeString(&ptr, buff) > -1) {
-				if(ptr == NULL || (ptr != NULL && atoi(ptr) == 0))
+			do {
+				if(writeString(&ptr, buff) == KEY_FROM_SELECTED)
+					break;
+				if(ptr == NULL)
 					break;
 				ptr = strtok(NULL, delim);
-				if(ptr == NULL || (ptr != NULL && atoi(ptr) == 0))
-					break;
-			}
-
+			} while(ptr != NULL && atoi(ptr) != 0);
 
 			continue;
 		}
@@ -854,14 +852,15 @@ int UserInput::addBranch(char **ptr) {
 			}
 		}
 
-		while(*ptr != NULL) {
+		do {
 			if((status = addDataSetString(ptr, buff)) == KEY_FROM_SELECTED)
 				break;
 
 			if(*ptr == NULL)
 				break;
 			*ptr = strtok(NULL, delim);
-		}
+		} while(*ptr != NULL);
+
 	}
 
 
@@ -2410,6 +2409,7 @@ void UserInput::printHelp() {
 	cout << "11.\tintv     <milliseconds> <wg ID> <ch ID>" << endl;
 	cout << "   \tintv     <milliseconds> ch <ch ID>" << endl;
 	cout << "   \tintv     <milliseconds> port <port>" << endl;
+	cout << "   \tintv     all <milliseconds>" << endl;
 	cout << endl;
 	cout << endl;
 
