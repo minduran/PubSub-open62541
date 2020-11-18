@@ -913,8 +913,9 @@ int UserInput::getStringFromCmd(char *buff, char *ptr) {
 	UA_UInt16 i = 0;
 	UA_UInt16 count = 1;
 //	cout << ptr << " length " << cmdLength << endl;
+	UA_Boolean missingClosure;
 
-	while (ptr[++i] != '"' && i < STRING_SIZE && i < cmdLength - 2) {
+	while ((missingClosure = (ptr[++i] != '"')) && i < STRING_SIZE && i < cmdLength - 2) {
 
 		if(ptr[i] == 0) {
 			buff[i - 1] = ' ';
@@ -943,6 +944,10 @@ int UserInput::getStringFromCmd(char *buff, char *ptr) {
 	}
 	buff[i - 1] = '\0';
 
+	if(missingClosure) {
+		UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Sign \" missing or string too long (max %u chars allowed) -> empty String set", STRING_SIZE - 1);
+		buff[0]= '\0';
+	}
 
 	return count;
 }

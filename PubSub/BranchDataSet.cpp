@@ -58,7 +58,8 @@ bool BranchDataSet::removeData(UA_UInt16 varKey) {
 		BranchField::count--;
 		pub->removeDataSetField(it->second.dataSetField);
 		fields.erase(varKey);
-		UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Field %d %d %d %d removed", varKey, key[B_DTS], key[B_WG], key[B_CONN]);
+		if(!isString)
+			UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Field %d %d %d %d removed", varKey, key[B_DTS], key[B_WG], key[B_CONN]);
 		return true;
 	}
 	UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Could not remove FD %u %u %u %u", varKey, key[B_DTS], key[B_WG], key[B_CONN]);
