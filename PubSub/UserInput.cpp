@@ -210,16 +210,15 @@ void UserInput::decode(char *cmdLine) {
 			const char *def= "pubsub.txt";
 			if (ptr == NULL) {
 //				cout << "Specify file location" << endl;
-				UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Open script file '%s'!", def);
 				file.open(def);
 			} else {
 				file.open(ptr);
-				UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Open script file '%s'!", ptr);
 				ptr = strtok(NULL, delim);
 			}
 
 			string lineText;
 			if (file.is_open()) {
+				UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Open script file '%s'!", ptr == NULL ? def : ptr);
 
 				while (getline(file,lineText))
 				{
@@ -614,6 +613,17 @@ void UserInput::decode(char *cmdLine) {
 
 
 /****************Add Branch************************************************************************/
+UA_UInt16 getN(char *p) {
+	char *buff = (char*)malloc(sizeof(char) * strlen(p) -2);
+	if (strncmp(p, "-n=", 3) == 0) {
+		memcpy(buff, &p[3], strlen(p) -2);
+	}
+	UA_UInt16 n = atoi(buff);
+	free(buff);
+	return n;
+}
+
+
 
 int UserInput::addBranch(char **ptr) {
 	UA_Byte status = NO_MATCHING_CMD;
@@ -653,11 +663,20 @@ int UserInput::addBranch(char **ptr) {
 	}
 	else if (strcmp(*ptr, "wg") == 0) {
 		*ptr = strtok(NULL, delim);
+
+		UA_Int16 n = 1;
+		if (*ptr != NULL && strncmp(*ptr, "-n=", 3) == 0) {
+			n = getN(*ptr);
+			*ptr = strtok(NULL, delim);
+		}
+
 		if (*ptr == NULL && b[B_CONN] == 0) {
 			cout << "Specify Channel ID to add WriterGroup" << endl;
 			return 0;
 		}
 
+
+		UA_Int16 count;
 		UA_UInt16 chID;
 		do {
 			chID = 0;
@@ -683,19 +702,25 @@ int UserInput::addBranch(char **ptr) {
 
 			map<UA_UInt16, BranchConnection>::iterator it;
 			if(tree.getChannel(chID, &it)) {
-				if(it->second.addWritergroup()) {
-					b[B_CONN] = chID;
-					b[B_WG] = it->second.wgKeyInc;
-					b[B_DTS] = 0;
-					b[B_VAR] = 0;
+				count = n;
+				while(count-- > 0) {
+					if(it->second.addWritergroup()) {
+						b[B_CONN] = chID;
+						b[B_WG] = it->second.wgKeyInc;
+						b[B_DTS] = 0;
+						b[B_VAR] = 0;
 
 
-					current_conn = it->second;
-					current_wg = it->second.wg.at(b[B_WG]);
-	//				cout << "New added WG " << current_wg->key[B_WG] << endl;
+						current_conn = it->second;
+						current_wg = it->second.wg.at(b[B_WG]);
+		//				cout << "New added WG " << current_wg->key[B_WG] << endl;
 
-					continue;
+					}
+					else {
+						break;
+					}
 				}
+				continue;
 			}
 		} while(status != KEY_FROM_SELECTED && *ptr != NULL && (*ptr = strtok(NULL, delim)) !=  NULL && atoi(*ptr) != 0);
 	}
@@ -703,6 +728,13 @@ int UserInput::addBranch(char **ptr) {
 
 	else if (strcmp(*ptr, "ds") == 0) {
 		*ptr = strtok(NULL, delim);
+
+		UA_Int16 n = 1;
+		if (*ptr != NULL && strncmp(*ptr, "-n=", 3) == 0) {
+			n = getN(*ptr);
+			*ptr = strtok(NULL, delim);
+		}
+
 		if (*ptr == NULL && b[B_WG] == 0) {
 			cout << "Specify WriterGroup ID to add DataSet" << endl;
 			return 0;
@@ -711,7 +743,7 @@ int UserInput::addBranch(char **ptr) {
 
 		UA_UInt16 wgID;
 		UA_UInt16 chID;
-
+		UA_Int16 count;
 		do {
 			wgID = 0;
 			chID = 0;
@@ -764,19 +796,25 @@ int UserInput::addBranch(char **ptr) {
 			if(tree.getChannel(chID, &it)) {
 				map<UA_UInt16, BranchWriterGroup>::iterator itwg;
 				if(it->second.getWritergroup(wgID, &itwg)) {
-					if(itwg->second.addDataset()) {
-						b[B_CONN] = chID;
-						b[B_WG] = wgID;
-						b[B_DTS] = itwg->second.dtsKeyInc;
-						b[B_VAR] = 0;
+					count = n;
+					while(count-- > 0) {
+						if(itwg->second.addDataset()) {
+							b[B_CONN] = chID;
+							b[B_WG] = wgID;
+							b[B_DTS] = itwg->second.dtsKeyInc;
+							b[B_VAR] = 0;
 
-						current_conn = it->second;
-						current_wg = itwg->second;
-						current_dts = itwg->second.dts.at(b[B_DTS]);
-	//					cout << "New added DS " << current_dts->key[B_DTS] << endl;
+							current_conn = it->second;
+							current_wg = itwg->second;
+							current_dts = itwg->second.dts.at(b[B_DTS]);
+		//					cout << "New added DS " << current_dts->key[B_DTS] << endl;
 
-						continue;
+						}
+						else {
+							break;
+						}
 					}
+					continue;
 				}
 			}
 
@@ -1069,11 +1107,17 @@ int UserInput::writeString(char **ptr, char *string) {
 int UserInput::addField(const UA_DataType *variableType, char **ptr) {
 	*ptr = strtok(NULL, delim);
 
+	UA_Int16 n = 1;
+	if (*ptr != NULL && strncmp(*ptr, "-n=", 3) == 0) {
+		n = getN(*ptr);
+		*ptr = strtok(NULL, delim);
+	}
+
 	UA_UInt16 dsID;
 	UA_UInt16 wgID;
 	UA_UInt16 chID;
 	UA_Byte status;
-
+	UA_Int16 count;
 	do {
 		dsID = 0;
 		wgID = 0;
@@ -1158,14 +1202,20 @@ int UserInput::addField(const UA_DataType *variableType, char **ptr) {
 						continue;
 					}
 
-					if(itdts->second.addData(variableType)) {
-						b[B_CONN] = chID;
-						b[B_WG] = wgID;
-						b[B_DTS] = dsID;
-						b[B_VAR] = itdts->second.varKeyInc;
+					count = n;
+					while(count-- > 0) {
+						if(itdts->second.addData(variableType)) {
+							b[B_CONN] = chID;
+							b[B_WG] = wgID;
+							b[B_DTS] = dsID;
+							b[B_VAR] = itdts->second.varKeyInc;
 
-						continue;
+						}
+						else {
+							break;
+						}
 					}
+					continue;
 				}
 			}
 		}
@@ -2374,10 +2424,12 @@ void UserInput::printHelp() {
 
 	cout << "Adding Node:"<< endl;
 	cout << "7. \tadd      ch <port>" << endl;
-	cout << "   \tadd      wg <ch ID>" << endl;
-	cout << "   \tadd      ds <wg ID> <ch ID>" << endl;
-	cout << "   \tadd      <selection> <ds ID> <wg ID> <ch ID>" << endl;
+	cout << "   \tadd      wg -n=<amount> <ch ID>" << endl;
+	cout << "   \tadd      ds -n=<amount> <wg ID> <ch ID>" << endl;
+	cout << "   \tadd      <selection> -n=<amount> <ds ID> <wg ID> <ch ID>" << endl;
 	cout << "   \tadd      ch <port> wg ds <selection>" << endl;
+	cout << "   Option:     '-n=<amount>' for adding certain amount of Nodes" << endl;
+	cout << "               without this option just adds 1 Node" << endl;
 	cout << "   Selection:  byte sbyte bool double float int16 int32 int64 uint16 uint32 uint64 date" << endl;
 	cout << "   Example:    add ch 4840 wg ds bool" << endl;
 	cout << "               add wg 1 ds 1 1 bool 1 1 1" << endl;
