@@ -30,7 +30,10 @@ g++ -o pubsub_publisher_console  PubSub/BranchConnection.cpp PubSub/BranchDataSe
 ```
 3. Execute:
 ```shell
-./pubsub_publisher_console
+./pubsub_publisher_console    # Note: Default TCP server port is 4840
+
+# To use different TCP server port:
+./pubsub_publisher_console -sp <port>
 ```
 
 #### Note
@@ -43,8 +46,15 @@ Once the console app is started you can enter ***help***. This will list all pos
 There is an executable [subscribe_standalone](https://github.com/minduran/PubSub-open62541/blob/main/PubSub/cmake-build-debug/subscribe_standalone) provided in directory *PubSub_open62541/PubSub/cmake-build-debug*. It might need permission to execute, this can be achieved with: ```chmod +x subscribe_standalone```. Alternatively you can compile the subscriber by yourself and execute it with: 
 ```shell
 cd PubSub_open62541
+
+# Compiling:
 g++ -o subscribe_standalone PubSub/Subscribe_standalone.cpp  -IPubSub/includes -LPubSub/library -lopen62541
-./subcribe_standalone
+
+# Executing:
+./subcribe_standalone   # Subscribes UDP port 4840 by default
+
+# To subscribe different UDP port:
+./subscribe_standalone -cp <port>
 ```
 
 ### Side Notes
