@@ -37,7 +37,7 @@ g++ -o pubsub_publisher_console  PubSub/BranchConnection.cpp PubSub/BranchDataSe
 ```
 
 #### Note
-There is already an executable of the app [PubSub](https://github.com/minduran/PubSub-open62541/tree/main/PubSub/Debug) located in directory *PubSub-open62541/PubSub/Debug*. This might just require permission to execute, for instance with ```chmod +x PubSub```
+There is already an executable of the app [PubSub](https://github.com/minduran/PubSub-open62541/tree/main/PubSub/Debug) located in directory *PubSub-open62541/PubSub/Debug*. This might just require permission to execute, for instance with `chmod +x PubSub`
 
 
 ## Using the Publisher console app
@@ -45,7 +45,7 @@ Once the console app is started you can enter ***help***. This will list all pos
 
 
 ## Subscribing
-There is an executable [subscribe_standalone](https://github.com/minduran/PubSub-open62541/blob/main/PubSub/cmake-build-debug/subscribe_standalone) provided in directory *PubSub_open62541/PubSub/cmake-build-debug*. It might need permission to execute, this can be achieved with: ```chmod +x subscribe_standalone```. Alternatively you can compile the subscriber by yourself and execute it with: 
+There is an executable [subscribe_standalone](https://github.com/minduran/PubSub-open62541/blob/main/PubSub/cmake-build-debug/subscribe_standalone) provided in directory *PubSub_open62541/PubSub/cmake-build-debug*. It might need permission to execute, this can be achieved with: `chmod +x subscribe_standalone`. Alternatively you can compile the subscriber by yourself and execute it with: 
 ```console
 cd PubSub_open62541
 
