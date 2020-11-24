@@ -23,7 +23,7 @@ The [Class Publisher](https://github.com/minduran/PubSub-open62541/blob/main/Pub
 ```console
 git clone https://github.com/minduran/PubSub-open62541
 ```
-2. Compile: the easiest way to compile the app is achieved by using following command lines and it takes about 1 minute using the [static library of open62541](https://github.com/minduran/PubSub-open62541/blob/main/PubSub/library/libopen62541.a):
+2. Compile: the easiest way to compile the app is achieved by using following command lines and it takes about 1 minute with the [static library of open62541](https://github.com/minduran/PubSub-open62541/blob/main/PubSub/library/libopen62541.a):
 ```console
 cd PubSub-open62541
 g++ -o pubsub_publisher_console  PubSub/BranchConnection.cpp PubSub/BranchDataSet.cpp PubSub/BranchField.cpp PubSub/BranchWriterGroup.cpp PubSub/InputArguments.cpp PubSub/Publisher.cpp PubSub/TreeTrunk.cpp PubSub/UserInput.cpp PubSub/main.cpp  -LPubSub/library/ -lopen62541 -lpthread
