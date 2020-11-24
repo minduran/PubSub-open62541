@@ -20,3 +20,4 @@ The class Publisher implements some functions which are mainly derived from add 
 - The structure of the Publisher Implementation of open62541 resembles a tree with Connections, WriterGroups, DataSets and DataField as branch forks.
 - The [PubSub](https://github.com/minduran/PubSub-open62541/tree/main/PubSub) folder is a C++ project in Eclipse. However, with the provided [CMakeLists](https://github.com/minduran/PubSub-open62541/tree/main/PubSub/CMakeLists.txt) file it should possible to open as project in CLion aswell.
 - The [PubSub console app](https://github.com/minduran/PubSub-open62541/tree/main/PubSub/Debug/PubSub) is devoloped on Ubuntu 20.04.1 LTS with Eclipse IDE 2020-09, GNU Make 4.2.1, g++ 9.3.0, gcc 9.3.0
+- The [Subscribe_standalone](https://github.com/minduran/PubSub-open62541/tree/main/PubSub/cmake-build-debug/subscribe_standalone) can decode and print the published data into console.
