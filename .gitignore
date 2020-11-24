@@ -1,3 +1,4 @@
+Subcriber_standalone/
 Field_information_publisher/
 RT_level_publisher/
 RT_level_subscriber/
@@ -6,5 +7,10 @@ something/
 *.o
 *.d
 *.mk
-PubSub/cmake-build-debug/
+PubSub/cmake-build-debug/CMakeFiles/
+PubSub/cmake-build-debug/CMakeCache.txt
+PubSub/cmake-build-debug/cmake_install.cmake
+PubSub/cmake-build-debug/Makefile
+PubSub/cmake-build-debug/default_config.txt
+PubSub/cmake-build-debug/PubSub.cbp
 PubSub/.idea/
