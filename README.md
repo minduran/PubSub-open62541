@@ -5,7 +5,7 @@ The [Class Publisher](https://github.com/minduran/PubSub-open62541/blob/main/Pub
 
 
 ## Features
-  - Manipulating publisher via console input:
+  - Manipulating publisher via console input commands:
     - Establishing/Removing Connections on a specific UDP port 
     - Adding/Removing WriterGroups to established connection
       - enabling/disabling publishing
