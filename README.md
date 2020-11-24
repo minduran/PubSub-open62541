@@ -1,5 +1,5 @@
 # PubSub-open62541
-This project contains an implementation of a **basic console app** which allows user to dynamically manipulate Connections, WriterGroups, DataSets and DataFields on runtime in a rudimental manner by only entering inputs in the console. This work may help understand the concept of the Publisher Implementation of [open62541](https://github.com/open62541/open62541) and its structure. This project uses the UDP Multicast Publisher example.
+This project contains an implementation of a **basic console app** which allows the user to dynamically manipulate Connections, WriterGroups, DataSets and DataFields on runtime in a rudimental manner by only entering inputs in the console. This work may help understand the concept of the Publisher Implementation of [open62541](https://github.com/open62541/open62541) and its structure. This project uses the UDP Multicast Publisher example.
 
 The [Class Publisher](https://github.com/minduran/PubSub-open62541/blob/main/PubSub/Publisher.h) implements some functions which are mainly derived from add functions found in [tutorial_pubsub_publisher.c](https://github.com/open62541/open62541/blob/master/examples/pubsub/tutorial_pubsub_publish.c). There are also more functions implemented for convenience.
 
@@ -37,7 +37,7 @@ g++ -o pubsub_publisher_console  PubSub/BranchConnection.cpp PubSub/BranchDataSe
 There is already an executable of the app [PubSub](https://github.com/minduran/PubSub-open62541/tree/main/PubSub/Debug) located in directory *PubSub-open62541/PubSub/Debug*. This might just require permission to execute, for instance with ```chmod +x PubSub```
 
 ## Using the Publisher console app
-Once the console app is started you can enter *help*. This will list all possible commands. Or take a look in [pubsub.txt](https://github.com/minduran/PubSub-open62541/blob/main/PubSub/Debug/pubsub.txt) which contains some random commands. You can load that text file containing commands with command *load <file location>/pubsub.txt*.
+Once the console app is started you can enter ***help***. This will list all possible commands. Or take a look in [pubsub.txt](https://github.com/minduran/PubSub-open62541/blob/main/PubSub/Debug/pubsub.txt) which contains some random commands. You can load that text file containing commands with command ***load <file location>/pubsub.txt***.
 
 ## Subscribing
 There is an executable [subscribe_standalone](https://github.com/minduran/PubSub-open62541/blob/main/PubSub/cmake-build-debug/subscribe_standalone) provided in directory *PubSub_open62541/PubSub/cmake-build-debug*. It might need permission to execute, this can be achieved with: ```chmod +x subscribe_standalone```. Alternatively you can compile the subscriber by yourself and execute it with: 
