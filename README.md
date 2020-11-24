@@ -1,7 +1,7 @@
 # PubSub-open62541
 This project contains an implementation of a **basic console app** which allows user to dynamically manipulate Connections, WriterGroups, DataSets and DataFields on runtime in a rudimental manner by only entering inputs in the console. This work may help understand the concept of the Publisher Implementation of [open62541](https://github.com/open62541/open62541) and its structure. This project uses the UDP Multicast Publisher example.
 
-The class Publisher implements some functions which are mainly derived from add functions found in [tutorial_pubsub_publisher.c](https://github.com/open62541/open62541/blob/master/examples/pubsub/tutorial_pubsub_publish.c). There are also more functions implemented for convenience.
+The [Class Publisher](https://github.com/minduran/PubSub-open62541/blob/main/PubSub/Publisher.h) implements some functions which are mainly derived from add functions found in [tutorial_pubsub_publisher.c](https://github.com/open62541/open62541/blob/master/examples/pubsub/tutorial_pubsub_publish.c). There are also more functions implemented for convenience.
 
 ## Features
   - Manipulating publisher via console input:
