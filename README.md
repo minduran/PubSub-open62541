@@ -68,6 +68,10 @@ g++ -o subscribe_standalone PubSub/Subscribe_standalone.cpp  -IPubSub/includes -
 - The [PubSub console app](https://github.com/minduran/PubSub-open62541/tree/main/PubSub/Debug/PubSub) is devoloped on Ubuntu 20.04.1 LTS with Eclipse IDE 2020-09, GNU Make 4.2.1, g++ 9.3.0, gcc 9.3.0
 
 - The [PubSub](https://github.com/minduran/PubSub-open62541/tree/main/PubSub) folder is a C++ project in Eclipse IDE. In addition, with the provided [CMakeLists](https://github.com/minduran/PubSub-open62541/tree/main/PubSub/CMakeLists.txt) file it should be possible to open it as project in CLion.
+  - After opening the project in your Eclipse, most likely, you need to adjust the setting in the properties in order to be able to build the project:
+      1.  right click on *Project -> Properties -> C/C++ Build* and check *Generate Makefiles automatically*
+      2.  If open62541 library is not installed on your System, right click on *Project -> Properties -> C/C++ Build -> Settings -> Tool Settings -> Cross G++ Linker -> Libraries* and add *Library search path*: click *Workspace...* and select *PubSub/library*
+      3.  *clean project* and *build project* should work now
 
 - How to build the open62541 static library for [Publish/Subscribe](https://open62541.org/doc/current/pubsub.html#pubsub), [source](https://open62541.org/doc/current/building.html):
 ```console
