@@ -39,8 +39,10 @@ g++ -o pubsub_publisher_console  PubSub/BranchConnection.cpp PubSub/BranchDataSe
 #### Note
 There is already an executable of the app [PubSub](https://github.com/minduran/PubSub-open62541/tree/main/PubSub/Debug) located in directory *PubSub-open62541/PubSub/Debug*. This might just require permission to execute, for instance with ```chmod +x PubSub```
 
+
 ## Using the Publisher console app
 Once the console app is started you can enter ***help***. This will list all possible commands. Or take a look in [pubsub.txt](https://github.com/minduran/PubSub-open62541/blob/main/PubSub/Debug/pubsub.txt) which contains some random commands. You can load that text file containing commands with command ***load <file location>/pubsub.txt***.
+
 
 ## Subscribing
 There is an executable [subscribe_standalone](https://github.com/minduran/PubSub-open62541/blob/main/PubSub/cmake-build-debug/subscribe_standalone) provided in directory *PubSub_open62541/PubSub/cmake-build-debug*. It might need permission to execute, this can be achieved with: ```chmod +x subscribe_standalone```. Alternatively you can compile the subscriber by yourself and execute it with: 
@@ -57,11 +59,16 @@ g++ -o subscribe_standalone PubSub/Subscribe_standalone.cpp  -IPubSub/includes -
 ./subscribe_standalone -cp <port>
 ```
 
-### Side Notes
+
+## Side Notes
 - The structure of the Publisher Implementation of open62541 resembles a tree with Connections, WriterGroups, DataSets and DataField as branch forks.
+
 - The Publisher and Subscriber of open65241 requires access to internet, since the connection profile is available only online.
-- The [PubSub](https://github.com/minduran/PubSub-open62541/tree/main/PubSub) folder is a C++ project in Eclipse IDE. In addition, with the provided [CMakeLists](https://github.com/minduran/PubSub-open62541/tree/main/PubSub/CMakeLists.txt) file it should be possible to open it as project in CLion.
+
 - The [PubSub console app](https://github.com/minduran/PubSub-open62541/tree/main/PubSub/Debug/PubSub) is devoloped on Ubuntu 20.04.1 LTS with Eclipse IDE 2020-09, GNU Make 4.2.1, g++ 9.3.0, gcc 9.3.0
+
+- The [PubSub](https://github.com/minduran/PubSub-open62541/tree/main/PubSub) folder is a C++ project in Eclipse IDE. In addition, with the provided [CMakeLists](https://github.com/minduran/PubSub-open62541/tree/main/PubSub/CMakeLists.txt) file it should be possible to open it as project in CLion.
+
 - How to build the open62541 static library for [Publish/Subscribe](https://open62541.org/doc/current/pubsub.html#pubsub), [source](https://open62541.org/doc/current/building.html):
 ```shell
 # Installing necessary tools:
