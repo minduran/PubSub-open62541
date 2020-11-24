@@ -20,16 +20,16 @@ The [Class Publisher](https://github.com/minduran/PubSub-open62541/blob/main/Pub
   
 ## Compiling and Executing the PubSub console app
 1. Get the PubSub folder from repository:
-```console
+```shell
 git clone https://github.com/minduran/PubSub-open62541
 ```
 2. Compile: the easiest way to compile the app is achieved by using following command lines and it takes about 1 minute with the [static library of open62541](https://github.com/minduran/PubSub-open62541/blob/main/PubSub/library/libopen62541.a):
-```console
+```shell
 cd PubSub-open62541
 g++ -o pubsub_publisher_console  PubSub/BranchConnection.cpp PubSub/BranchDataSet.cpp PubSub/BranchField.cpp PubSub/BranchWriterGroup.cpp PubSub/InputArguments.cpp PubSub/Publisher.cpp PubSub/TreeTrunk.cpp PubSub/UserInput.cpp PubSub/main.cpp  -LPubSub/library/ -lopen62541 -lpthread
 ```
 3. Execute:
-```console
+```shell
 ./pubsub_publisher_console    # Note: Default TCP server port is 4840
 
 # To use different TCP server port:
@@ -46,7 +46,7 @@ Once the console app is started you can enter ***help***. This will list all pos
 
 ## Subscribing
 There is an executable [subscribe_standalone](https://github.com/minduran/PubSub-open62541/blob/main/PubSub/cmake-build-debug/subscribe_standalone) provided in directory *PubSub_open62541/PubSub/cmake-build-debug*. It might need permission to execute, this can be achieved with: `chmod +x subscribe_standalone`. Alternatively you can compile the subscriber by yourself and execute it with: 
-```console
+```shell
 cd PubSub_open62541
 
 # Compiling:
@@ -74,7 +74,7 @@ g++ -o subscribe_standalone PubSub/Subscribe_standalone.cpp  -IPubSub/includes -
       3.  *clean project* and *build project* should work now
 
 - How to build the open62541 static library for [Publish/Subscribe](https://open62541.org/doc/current/pubsub.html#pubsub), [source](https://open62541.org/doc/current/building.html):
-```console
+```shell
 # Installing necessary tools:
 sudo apt-get install git build-essential gcc pkg-config cmake python
 
