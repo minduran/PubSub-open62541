@@ -14,7 +14,7 @@ The [Class Publisher](https://github.com/minduran/PubSub-open62541/blob/main/Pub
       - a DataSet can emulate a String by holding a set of Fields of type Byte. Each field represents a character.
     - Adding/Removing DataFields to DataSets
       - one Field can hold Data of either type Byte, SByte, Float, Double, Int16, Int32, Int64, UInt16, UInt32, UInt64 or DateTime
-      - setting value of Data
+      - changing the value of Data
   - Loading input commands from text file
   
   
