@@ -1,0 +1,98 @@
+add ch 1234
+add wg
+add ds
+add string "some"
+add wg off
+add wg off
+add wg
+add wg off
+add wg
+add wg
+add wg
+add wg
+add wg
+add ch 5454
+add wg
+add ds
+add string "some"
+add string "some"
+add wg
+add wg
+add ds
+add float wrt 0.000000
+add wg
+add ch 1258
+add wg
+add wg
+add ds
+add wg
+add wg
+add wg
+add wg
+add ds
+add wg
+add ch 3663
+add wg
+add wg
+add ch 9898
+add wg
+add wg
+add ds
+add ch 3256
+add wg
+add ds
+add ds
+add wg
+add ds
+add ds
+add ds
+add wg
+add wg
+add ds
+add ch 4860
+add wg
+add ds
+add bool wrt 1
+add float wrt 1.234000
+add int32 wrt 3
+add double wrt 9.054000
+add byte wrt 255
+add uint64 wrt 9999
+add ch 4843
+add wg
+add ds
+add bool wrt 0
+add wg
+add ds
+add byte wrt 13
+add ch 4842
+add wg intv 1000
+add string "hello world!"
+add string "something new"
+add string "just for fun"
+add string "I am tired of debugging"
+add string "how can this weird behavior even be possible"
+add ch 4841
+add wg intv 1000 off
+add string "Hello Sunshine!"
+add ds
+add bool wrt 1
+add date
+add ch 9999
+add wg
+add ds
+add bool wrt 0
+add byte wrt 0
+add wg
+add ds
+add float wrt 0.000000
+add ds
+add double wrt 0.000000
+add wg
+add ds
+add date
+add wg
+add ch 1234
+add ch 4840
+add wg
+add string ""
