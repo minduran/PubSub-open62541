@@ -16,6 +16,7 @@ The [Class Publisher](https://github.com/minduran/PubSub-open62541/blob/main/Pub
       - one Field can hold Data of either type Byte, SByte, Float, Double, Int16, Int32, Int64, UInt16, UInt32, UInt64 or DateTime
       - changing the value of Data
   - Loading input commands from text file
+  - Exporting commands from current setup into text file
   
   
 ## Compiling and Executing the PubSub console app
