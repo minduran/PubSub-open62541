@@ -55,6 +55,8 @@ public:
 	void updateWriterGroupOfChannel(UA_UInt16 chKey, UA_UInt16 interval);
 	void updateWriterGroupOfPort(UA_UInt16 port, UA_UInt16 interval);
 
+	void printToFile(ofstream &file);
+
 };
 
 #endif /* TREETRUNK_H_ */

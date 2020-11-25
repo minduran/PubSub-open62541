@@ -108,6 +108,10 @@ void BranchWriterGroup::enable() {
 	UA_Server_setWriterGroupOperational(pub->server, writerGroup);
 }
 
+bool BranchWriterGroup::isEnabled(){
+	return this->enabled;
+}
+
 void BranchWriterGroup::update(UA_UInt32 interval) {
 	UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "WG %u %u updated interval %u", key[B_WG], key[B_CONN], interval);
 	wgConfig.publishingInterval = interval;

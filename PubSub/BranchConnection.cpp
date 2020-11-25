@@ -44,7 +44,7 @@ bool BranchConnection::addWritergroup() {
 	if(!writergroupExists(wgKeyInc)) {
 		BranchWriterGroup::count++;
 		BranchWriterGroup wgBranch(key[B_CONN], wgKeyInc);
-		wgBranch.writerGroup = pub->addWriterGroup(100, this->connection);
+		wgBranch.writerGroup = pub->addWriterGroup(DEFAULT_PUBLISH_INTERVAL, this->connection);
 		memset(&wgBranch.wgConfig, 0, sizeof(UA_WriterGroupConfig));
 		UA_Server_getWriterGroupConfig(pub->server, wgBranch.writerGroup, &wgBranch.wgConfig);
 		wg.insert(pair<UA_UInt16, BranchWriterGroup>(wgKeyInc, wgBranch));

@@ -202,6 +202,24 @@ void UserInput::decode(char *cmdLine) {
 		else if(strcmp(ptr, "show") == 0) {
 			tree.showChannels();
 		}
+		else if (strcmp(ptr, "export") == 0) {
+			ptr = strtok(NULL, delim);
+
+			if (ptr == NULL) {
+				cout << "Specify file name location" << endl;
+				continue;
+			} else {
+				ofstream file(ptr);
+				if(file.is_open()) {
+					tree.printToFile(file);
+					file.close();
+					UA_LOG_INFO(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Node Setup exported to '%s'", ptr);
+				}
+				else {
+					UA_LOG_ERROR(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "Could not open script file '%s'!", ptr);
+				}
+			}
+		}
 		else if (strcmp(ptr, "load") == 0) {
 			ptr = strtok(NULL, delim);
 
@@ -254,8 +272,6 @@ void UserInput::decode(char *cmdLine) {
 					continue;
 				if (ptr == NULL)
 					break;
-
-
 				ptr = strtok(NULL, delim);
 			}
 
@@ -1277,7 +1293,7 @@ int UserInput::removeBranch(char **ptr) {
 				continue;
 			}
 
-		} while(*ptr != NULL && (*ptr = strtok(NULL, delim)) != NULL && atoi(*ptr) != 0 && status != KEY_FROM_SELECTED);
+		} while(*ptr != NULL && status != KEY_FROM_SELECTED && (*ptr = strtok(NULL, delim)) != NULL && atoi(*ptr) != 0);
 
 	}
 
@@ -1353,7 +1369,7 @@ int UserInput::removeBranch(char **ptr) {
 					continue;
 				}
 			}
-		} while(*ptr != NULL && (*ptr = strtok(NULL, delim)) != NULL && atoi(*ptr) != 0 && status != KEY_FROM_SELECTED);
+		} while(*ptr != NULL && status != KEY_FROM_SELECTED && (*ptr = strtok(NULL, delim)) != NULL && atoi(*ptr) != 0);
 
 	}
 
@@ -1457,7 +1473,7 @@ int UserInput::removeBranch(char **ptr) {
 				}
 			}
 
-		} while(*ptr != NULL && (*ptr = strtok(NULL, delim)) != NULL && atoi(*ptr) != 0 && status != KEY_FROM_SELECTED);
+		} while(*ptr != NULL && status != KEY_FROM_SELECTED && (*ptr = strtok(NULL, delim)) != NULL && atoi(*ptr) != 0);
 
 	}
 
@@ -1481,10 +1497,11 @@ int UserInput::removeBranch(char **ptr) {
 				else  {
 					status = KEY_FROM_SELECTED;
 				}
+
 			}
 
 			if (status != KEY_FROM_INPUT) {
-				if (b[B_DTS] == 0) {
+				if (b[B_VAR] == 0) {
 					cout << "Specify Field ID for removing" << endl;
 					return 0;
 				}
@@ -1592,7 +1609,7 @@ int UserInput::removeBranch(char **ptr) {
 				}
 			}
 
-		} while(*ptr != NULL && (*ptr = strtok(NULL, delim)) !=  NULL && atoi(*ptr) != 0 && status != KEY_FROM_SELECTED);
+		} while(*ptr != NULL && status != KEY_FROM_SELECTED && (*ptr = strtok(NULL, delim)) !=  NULL && atoi(*ptr) != 0);
 
 	}
 
@@ -1643,7 +1660,7 @@ int UserInput::writeVariable(char **ptr) {
 	}
 
 	if (status != KEY_FROM_INPUT) {
-		if (b[B_DTS] == 0) {
+		if (b[B_VAR] == 0) {
 			cout << "Specify Field ID for removing" << endl;
 			return 0;
 		}
@@ -2487,6 +2504,7 @@ void UserInput::printHelp() {
 
 	cout << "Loading Command Script" << endl;
 	cout << "16.\tload     <filename>" << endl;
+	cout << "17.\texport   <filename>  (generates commands for current node setup and writes them into specified file)" << endl;
 
 
 	cout << HINT_GENERAL << endl;

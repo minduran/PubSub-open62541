@@ -46,6 +46,8 @@ public:
 	void disable();
 	void enable();
 
+	bool isEnabled();
+
 	void update(UA_UInt32 interval);
 
 	void print();

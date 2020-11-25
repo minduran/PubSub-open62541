@@ -31,6 +31,8 @@ public:
 	void writeValue(char *value);
 	void writeStringChar(char value);
 
+	void readValue(UA_Variant *value);
+
 	void print();
 };
 

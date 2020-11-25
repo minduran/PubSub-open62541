@@ -8,6 +8,8 @@
 #include "TreeTrunk.h"
 
 #include <iostream>
+#include <iomanip>
+#include <fstream>
 
 using namespace std;
 
@@ -228,4 +230,86 @@ void TreeTrunk::updateWriterGroupOfPort(UA_UInt16 port, UA_UInt16 interval) {
 	}
 	if (!found)
 		UA_LOG_WARNING(UA_Log_Stdout, UA_LOGCATEGORY_USERLAND, "No Channel on port %u found", port);
+}
+
+void TreeTrunk::printToFile(ofstream &file) {
+	map<UA_UInt16, BranchConnection>::iterator it;
+	map<UA_UInt16, BranchWriterGroup>::iterator itwg;
+	map<UA_UInt16, BranchDataSet>::iterator itdts;
+	map<UA_UInt16, BranchField>::iterator itfd;
+	for (it = conns.begin(); it != conns.end(); it++) {
+		file << "add ch " << it->second.port << endl;
+		for(itwg = it->second.wg.begin(); itwg != it->second.wg.end(); itwg++) {
+			file << "add wg";
+			if (itwg->second.wgConfig.publishingInterval != DEFAULT_PUBLISH_INTERVAL)
+				file << " intv " << itwg->second.wgConfig.publishingInterval;
+			if (!itwg->second.isEnabled())
+				file <<  " off";
+			file << endl;
+			for (itdts = itwg->second.dts.begin(); itdts != itwg->second.dts.end(); itdts++) {
+				if (itdts->second.isString) {
+					file << "add string " << "\"";
+					for(itfd = itdts->second.fields.begin(); itfd != itdts->second.fields.end(); itfd++) {
+						UA_Variant val;
+						itfd->second.readValue(&val);
+						file << *(UA_Byte*)val.data;
+					}
+					file << "\"" << endl;
+				}
+				else {
+					file << "add ds" << endl;
+					for(itfd = itdts->second.fields.begin(); itfd != itdts->second.fields.end(); itfd++) {
+						if (itfd->second.variableType == VAR_TYPE_DATETIME) {
+							file << "add date";
+						}
+						else {
+							UA_Variant val;
+							itfd->second.readValue(&val);
+							file << "add ";
+							if (itfd->second.variableType == VAR_TYPE_BYTE) {
+								file << "byte wrt " << *(UA_UInt16*) val.data;
+							}
+							else if (itfd->second.variableType == VAR_TYPE_SBYTE) {
+								file << "sbyte wrt " << *(UA_Int16*) val.data;
+							}
+							else if (itfd->second.variableType == VAR_TYPE_BOOLEAN) {
+								file << "bool wrt " << *(UA_Boolean*) val.data;
+							}
+							else if (itfd->second.variableType == VAR_TYPE_FLOAT) {
+								file << fixed;
+								file << "float wrt " << setprecision(6) << *(UA_Float*) val.data;
+								file << resetiosflags(ios::fixed);
+							}
+							else if (itfd->second.variableType == VAR_TYPE_DOUBLE) {
+								file << fixed;
+								file << "double wrt " << setprecision(6) << *(UA_Double*) val.data;
+								file << resetiosflags(ios::fixed);
+							}
+							else if (itfd->second.variableType == VAR_TYPE_INT16) {
+								file << "int16 wrt " << *(UA_Int16*) val.data;
+							}
+							else if (itfd->second.variableType == VAR_TYPE_INT32) {
+								file << "int32 wrt " << *(UA_Int32*) val.data;
+							}
+							else if (itfd->second.variableType == VAR_TYPE_INT64) {
+								file << "int64 wrt " << *(UA_Int64*) val.data;
+							}
+							else if (itfd->second.variableType == VAR_TYPE_UINT16) {
+								file << "uint16 wrt " << *(UA_UInt16*) val.data;
+								}
+							else if (itfd->second.variableType == VAR_TYPE_UINT32) {
+								file << "uint32 wrt " << *(UA_UInt32*) val.data;
+							}
+							else if (itfd->second.variableType == VAR_TYPE_UINT64) {
+								file << "uint64 wrt " << *(UA_UInt64*) val.data;
+							}
+
+							UA_Variant_clear(&val);
+						}
+						file << endl;
+					}
+				}
+			}
+		}
+	}
 }

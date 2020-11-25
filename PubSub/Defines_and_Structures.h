@@ -26,17 +26,7 @@ typedef struct {
 	UA_UInt16 varKey;
 } BranchID;
 
-//typedef struct{
-//	UA_NodeId id;
-//	UA_DataType type;
-//} VarNode;
-//
-//
-//typedef struct{
-//	UA_NodeId wg;
-//	UA_DataType config;
-//} WriterGroup;
-
+#define DEFAULT_PUBLISH_INTERVAL	100
 
 #define B_CONN					0
 #define B_WG					1
@@ -71,28 +61,28 @@ typedef struct {
 #define VAR_TYPE_DATETIME		&UA_TYPES[UA_TYPES_DATETIME]
 
 //#define ID_DOUBLE(x)			UA_NODEID_NUMERIC(1, 1000 + (UA_UInt32)(x))
-//#define ID_FLOAT(x)				UA_NODEID_NUMERIC(1, 2000 + (UA_UInt32)(x))
+//#define ID_FLOAT(x)			UA_NODEID_NUMERIC(1, 2000 + (UA_UInt32)(x))
 //#define ID_BOOLEAN(x)			UA_NODEID_NUMERIC(1, 3000 + (UA_UInt32)(x))
-//#define ID_BYTE(x)				UA_NODEID_NUMERIC(1, 4000 + (UA_UInt32)(x))
-//#define ID_SBYTE(x)				UA_NODEID_NUMERIC(1, 4500 + (UA_UInt32)(x))
-//#define ID_INT32(x)				UA_NODEID_NUMERIC(1, 5000 + (UA_UInt32)(x))
+//#define ID_BYTE(x)			UA_NODEID_NUMERIC(1, 4000 + (UA_UInt32)(x))
+//#define ID_SBYTE(x)			UA_NODEID_NUMERIC(1, 4500 + (UA_UInt32)(x))
+//#define ID_INT32(x)			UA_NODEID_NUMERIC(1, 5000 + (UA_UInt32)(x))
 //#define ID_UINT32(x)			UA_NODEID_NUMERIC(1, 6000 + (UA_UInt32)(x))
-//#define ID_INT16(x)				UA_NODEID_NUMERIC(1, 7000 + (UA_UInt32)(x))
+//#define ID_INT16(x)			UA_NODEID_NUMERIC(1, 7000 + (UA_UInt32)(x))
 //#define ID_UINT16(x)			UA_NODEID_NUMERIC(1, 7500 + (UA_UInt32)(x))
-//#define ID_INT64(x)				UA_NODEID_NUMERIC(1, 8000 + (UA_UInt32)(x))
+//#define ID_INT64(x)			UA_NODEID_NUMERIC(1, 8000 + (UA_UInt32)(x))
 //#define ID_UINT64(x)			UA_NODEID_NUMERIC(1, 9000 + (UA_UInt32)(x))
 
-#define ID_DOUBLE			UA_NODEID_NUMERIC(1, 1000)
+#define ID_DOUBLE				UA_NODEID_NUMERIC(1, 1000)
 #define ID_FLOAT				UA_NODEID_NUMERIC(1, 2000)
-#define ID_BOOLEAN			UA_NODEID_NUMERIC(1, 3000)
-#define ID_BYTE				UA_NODEID_NUMERIC(1, 4000)
+#define ID_BOOLEAN				UA_NODEID_NUMERIC(1, 3000)
+#define ID_BYTE					UA_NODEID_NUMERIC(1, 4000)
 #define ID_SBYTE				UA_NODEID_NUMERIC(1, 4500)
 #define ID_INT32				UA_NODEID_NUMERIC(1, 5000)
-#define ID_UINT32			UA_NODEID_NUMERIC(1, 6000)
+#define ID_UINT32				UA_NODEID_NUMERIC(1, 6000)
 #define ID_INT16				UA_NODEID_NUMERIC(1, 7000)
-#define ID_UINT16			UA_NODEID_NUMERIC(1, 7500)
+#define ID_UINT16				UA_NODEID_NUMERIC(1, 7500)
 #define ID_INT64				UA_NODEID_NUMERIC(1, 8000)
-#define ID_UINT64			UA_NODEID_NUMERIC(1, 9000)
+#define ID_UINT64				UA_NODEID_NUMERIC(1, 9000)
 
 #define INDEX_DOUBLE			0
 #define INDEX_FLOAT				1
